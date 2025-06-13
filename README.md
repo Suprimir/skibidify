@@ -15,7 +15,7 @@ Tener [Node.js](https://nodejs.org/) instalado.
 1. **Clonar repositorio**
    ```bash
    git clone <your-repo-url>
-   cd music-player
+   cd skibidify
    ```
 
 2. **Instalar dependencias**
