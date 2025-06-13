@@ -32,5 +32,5 @@ Tener [Node.js](https://nodejs.org/) instalado.
 - **Backend (Server)**: [http://localhost:3000](http://localhost:3000)
 
 <div align="center">
-  <p>Hecho con ❤️ con propósitos de aprendizaje</p>
+  <p>Hecho con con propósitos de aprendizaje</p>
 </div>
