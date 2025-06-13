@@ -1,16 +1,14 @@
 import express from "express";
 import cors from "cors";
+import songRouter from "./routes/song";
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.get("/hola", (req, res) => {
-  console.log("hola amigo");
-  res.send("hola");
-});
+app.use("/api/songs", songRouter);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

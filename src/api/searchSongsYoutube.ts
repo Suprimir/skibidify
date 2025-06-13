@@ -1,4 +1,4 @@
-import type { YouTubeSearchResponse } from "../types/YoutubeSearch";
+import type { YouTubeSearchResponse } from "../../types/YoutubeSearch";
 
 export async function searchSongsYoutube(searchTerm: string) {
   try {

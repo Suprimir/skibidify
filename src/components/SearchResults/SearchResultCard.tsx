@@ -17,6 +17,31 @@ export default function SearchResultCard({
 }: SearchResultCardProps) {
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
+  const handleDownload = async () => {
+    setIsDownloading(true);
+
+    try {
+      const response = await fetch("/api/songs/download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          youtubeItem,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`ERROR! Estado: ${response.status}`);
+      }
+
+      const data = await response.json();
+      alert(data.message || data);
+    } catch (error) {
+      console.error("Error en la descarga:", error);
+      alert("Error al descargar la canción");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
   return (
     <div className="flex max-w-4xl p-3 space-x-4 rounded-lg bg-rose-100">
       <div className="flex items-center justify-center flex-shrink-0 overflow-hidden rounded-md size-24">
@@ -33,7 +58,7 @@ export default function SearchResultCard({
           <p>{youtubeItem.snippet.channelTitle}</p>
         </div>
         <button
-          onClick={() => setIsDownloading(true)}
+          onClick={handleDownload}
           disabled={isDownloading}
           className="flex items-center justify-center gap-2 px-4 py-2 my-auto font-bold text-white rounded-md cursor-pointer bg-rose-400 disabled:bg-rose-300 disabled:cursor-default me-4"
         >

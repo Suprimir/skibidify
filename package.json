@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently --kill-others-on-fail -n \"Client,Server\" \"npm run dev:client\" \"npm run dev:server\"",
     "dev:client": "vite",
-    "dev:server": "nodemon --exec tsx --env-file=.env server/index.ts",
+    "dev:server": "nodemon --ignore public/songs/songs.json --exec tsx --env-file=.env server/index.ts",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -16,13 +16,16 @@
     "@types/express": "^5.0.3",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "ffmpeg-static": "^5.2.0",
+    "fs": "^0.0.1-security",
     "lucide-react": "^0.514.0",
     "path": "^0.12.7",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2",
     "tailwindcss": "^4.1.8",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "yt-dlp-exec": "^1.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
