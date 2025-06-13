@@ -1,24 +1,18 @@
-import { useRef } from "react";
 import type { Song } from "@Types/Song";
 import { Play } from "lucide-react";
 
 interface SongCardProps {
+  setSongPlaying: (song: string) => void;
   song: Song;
 }
 
-export default function SongCard({ song }: SongCardProps) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
+export default function SongCard({ song, setSongPlaying }: SongCardProps) {
   const handlePlay = () => {
-    if (!audioRef.current) {
-      console.log(song.filePath);
-      audioRef.current = new Audio(song.filePath);
-    }
-    audioRef.current.play();
+    setSongPlaying(song.filePath);
   };
 
   return (
-    <div className="flex max-w-4xl p-3 space-x-4 rounded-lg bg-rose-100">
+    <div className="flex max-w-screen p-3 space-x-4 rounded-lg bg-rose-100">
       <div className="flex items-center justify-center flex-shrink-0 overflow-hidden rounded-md size-24">
         <img
           src={song.thumbnailUrl}

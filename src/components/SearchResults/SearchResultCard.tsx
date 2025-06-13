@@ -43,7 +43,7 @@ export default function SearchResultCard({
     }
   };
   return (
-    <div className="flex max-w-4xl p-3 space-x-4 rounded-lg bg-rose-100">
+    <div className="flex max-w-screen p-3 space-x-4 rounded-lg bg-rose-100">
       <div className="flex items-center justify-center flex-shrink-0 overflow-hidden rounded-md size-24">
         <img
           src={youtubeItem.snippet.thumbnails.high.url}
