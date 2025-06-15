@@ -1,37 +1,68 @@
 import type { Song } from "@Types/Song";
+import { useState } from "react";
 import { Play } from "lucide-react";
+import { usePlayer } from "@Contexts/PlayerContext";
+import CustomContextMenu from "./ContextMenuSong";
 
 interface SongCardProps {
-  setSongPlaying: (song: string) => void;
   song: Song;
 }
 
-export default function SongCard({ song, setSongPlaying }: SongCardProps) {
-  const handlePlay = () => {
-    setSongPlaying(song.filePath);
+export default function SongCard({ song }: SongCardProps) {
+  const { handlePlay } = usePlayer();
+
+  const [contextMenu, setContextMenu] = useState({
+    visible: false,
+    x: 0,
+    y: 0,
+  });
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+    });
   };
 
   return (
-    <div className="flex max-w-screen p-3 space-x-4 rounded-lg bg-rose-100">
-      <div className="flex items-center justify-center flex-shrink-0 overflow-hidden rounded-md size-24">
-        <img
-          src={song.thumbnailUrl}
-          className="object-cover object-center w-36 h-36"
-        />
-      </div>
-      <div className="flex justify-between w-full">
-        <div className="flex flex-col justify-center">
-          <h1 className="font-bold">{song.title}</h1>
-          <p>{song.channelTitle}</p>
+    <>
+      <div
+        onContextMenu={handleContextMenu}
+        className="flex w-full p-4 space-x-5 transition-all border shadow-md rounded-xl bg-primary-50 backdrop-blur-sm border-primary-200/50 hover:shadow-lg hover:bg-primary-200/90 group"
+      >
+        <div className="flex items-center justify-center flex-shrink-0 overflow-hidden transition-all border shadow-md rounded-xl size-16 sm:size-24 border-primary-200/30">
+          <img
+            src={song.thumbnailUrl}
+            className="object-cover object-center w-32 h-32 transition-transform rounded-xl group-hover:scale-105"
+          />
         </div>
-        <button
-          onClick={handlePlay}
-          className="flex items-center justify-center gap-2 px-4 py-2 my-auto font-bold text-white rounded-md cursor-pointer bg-rose-400 hover:bg-rose-500 me-4"
-        >
-          <Play size={20} />
-          Play
-        </button>
+        <div className="flex justify-between w-full">
+          <div className="flex flex-col justify-center flex-1 min-w-0">
+            <h1 className="font-bold truncate transition-colors text-primary-800 text-md sm:text-lg drop-shadow-sm group-hover:text-primary-900">
+              {song.title}
+            </h1>
+            <p className="font-medium truncate transition-colors text-primary-600 group-hover:text-primary-700">
+              {song.channelTitle}
+            </p>
+          </div>
+          <button
+            onClick={() => handlePlay(song)}
+            className="flex items-center justify-center gap-2 my-auto font-bold transition-all border rounded-full shadow-md cursor-pointer bg-gradient-to-r from-primary-500 to-primary-500 hover:from-primary-600 hover:to-primary-600 me-4 hover:shadow-lg hover:scale-110 active:scale-95 border-primary-300/50"
+          >
+            <Play className="w-12 h-12 p-3 text-primary-50 drop-shadow-sm" />
+          </button>
+        </div>
       </div>
-    </div>
+
+      <CustomContextMenu
+        x={contextMenu.x}
+        y={contextMenu.y}
+        visible={contextMenu.visible}
+        onClose={() => setContextMenu({ ...contextMenu, visible: false })}
+        song={song}
+      />
+    </>
   );
 }

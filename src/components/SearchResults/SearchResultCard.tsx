@@ -1,8 +1,9 @@
 import { Download, LoaderCircle } from "lucide-react";
 import type { YouTubeSearchItem } from "@Types/YoutubeSearch";
-import { useState } from "react";
+import { useSongs } from "@Contexts/SongContext";
 
 interface SearchResultCardProps {
+  downloadingId: string | null;
   youtubeItem: YouTubeSearchItem;
 }
 
@@ -13,37 +14,22 @@ function decodeHtmlEntities(text: string): string {
 }
 
 export default function SearchResultCard({
+  downloadingId,
   youtubeItem,
 }: SearchResultCardProps) {
-  const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  const { downloadSong } = useSongs();
 
   const handleDownload = async () => {
-    setIsDownloading(true);
-
     try {
-      const response = await fetch("/api/songs/download", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          youtubeItem,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`ERROR! Estado: ${response.status}`);
-      }
-
-      const data = await response.json();
-      alert(data.message || data);
-    } catch (error) {
-      console.error("Error en la descarga:", error);
+      await downloadSong(youtubeItem);
+      alert("Descarga finalizada");
+    } catch {
       alert("Error al descargar la canción");
-    } finally {
-      setIsDownloading(false);
     }
   };
+
   return (
-    <div className="flex max-w-screen p-3 space-x-4 rounded-lg bg-rose-100">
+    <div className="flex p-3 space-x-4 rounded-lg max-w-screen bg-primary-100">
       <div className="flex items-center justify-center flex-shrink-0 overflow-hidden rounded-md size-24">
         <img
           src={youtubeItem.snippet.thumbnails.high.url}
@@ -59,10 +45,10 @@ export default function SearchResultCard({
         </div>
         <button
           onClick={handleDownload}
-          disabled={isDownloading}
-          className="flex items-center justify-center gap-2 px-4 py-2 my-auto font-bold text-white rounded-md cursor-pointer bg-rose-400 disabled:bg-rose-300 disabled:cursor-default me-4"
+          disabled={!!downloadingId}
+          className="flex items-center justify-center gap-2 px-4 py-2 my-auto font-bold text-white rounded-md cursor-pointer bg-primary-400 disabled:bg-primary-300 disabled:cursor-default me-4"
         >
-          {isDownloading ? (
+          {downloadingId === youtubeItem.id.videoId ? (
             <LoaderCircle className="size-6 animate-spin" />
           ) : (
             <Download className="size-6" />

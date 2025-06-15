@@ -20,11 +20,6 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-
-    "baseUrl": ".",
-    "paths": {
-      "@Types/*": ["types/*"]
-    }
   },
   "include": ["vite.config.ts"]
 }

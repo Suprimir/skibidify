@@ -1,1 +1,226 @@
 @import "tailwindcss";
+
+/* === CONFIGURACIÓN @THEME PARA TAILWIND 4 === */
+@theme {
+  /* Colores base que cambiarán según el tema */
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  --color-muted: #f8fafc;
+  --color-muted-foreground: #64748b;
+  --color-border: #e2e8f0;
+  --color-ring: #64748b;
+  --color-accent: #64748b;
+  
+  /* Paleta primaria por defecto */
+  --color-primary-50: #f8fafc;
+  --color-primary-100: #f1f5f9;
+  --color-primary-200: #e2e8f0;
+  --color-primary-300: #cbd5e1;
+  --color-primary-400: #94a3b8;
+  --color-primary-500: #64748b;
+  --color-primary-600: #475569;
+  --color-primary-700: #334155;
+  --color-primary-800: #1e293b;
+  --color-primary-900: #0f172a;
+  --color-primary-950: #020617;
+  
+  /* Paleta secundaria por defecto */
+  --color-secondary-50: #f9fafb;
+  --color-secondary-100: #f3f4f6;
+  --color-secondary-200: #e5e7eb;
+  --color-secondary-300: #d1d5db;
+  --color-secondary-400: #9ca3af;
+  --color-secondary-500: #6b7280;
+  --color-secondary-600: #4b5563;
+  --color-secondary-700: #374151;
+  --color-secondary-800: #1f2937;
+  --color-secondary-900: #111827;
+  --color-secondary-950: #030712;
+}
+
+/* === VARIANTES DE TEMA LIGHT === */
+
+/* Tema Pink Light */
+.theme-pink {
+  --color-primary-50: #fdf2f8;
+  --color-primary-100: #fce7f3;
+  --color-primary-200: #fbcfe8;
+  --color-primary-300: #f9a8d4;
+  --color-primary-400: #f472b6;
+  --color-primary-500: #ec4899;
+  --color-primary-600: #db2777;
+  --color-primary-700: #be185d;
+  --color-primary-800: #9d174d;
+  --color-primary-900: #831843;
+  --color-primary-950: #500724;
+  
+  --color-secondary-50: #fff1f2;
+  --color-secondary-100: #ffe4e6;
+  --color-secondary-200: #fecdd3;
+  --color-secondary-300: #fda4af;
+  --color-secondary-400: #fb7185;
+  --color-secondary-500: #f43f5e;
+  --color-secondary-600: #e11d48;
+  --color-secondary-700: #be123c;
+  --color-secondary-800: #9f1239;
+  --color-secondary-900: #881337;
+  --color-secondary-950: #4c0519;
+  
+  --color-accent: #f472b6;
+  --color-ring: #ec4899;
+}
+
+/* Tema Green Light */
+.theme-green {
+  --color-primary-50: #f0fdf4;
+  --color-primary-100: #dcfce7;
+  --color-primary-200: #bbf7d0;
+  --color-primary-300: #86efac;
+  --color-primary-400: #4ade80;
+  --color-primary-500: #22c55e;
+  --color-primary-600: #16a34a;
+  --color-primary-700: #15803d;
+  --color-primary-800: #166534;
+  --color-primary-900: #14532d;
+  --color-primary-950: #052e16;
+  
+  --color-secondary-50: #f7fee7;
+  --color-secondary-100: #ecfccb;
+  --color-secondary-200: #d9f99d;
+  --color-secondary-300: #bef264;
+  --color-secondary-400: #a3e635;
+  --color-secondary-500: #84cc16;
+  --color-secondary-600: #65a30d;
+  --color-secondary-700: #4d7c0f;
+  --color-secondary-800: #3f6212;
+  --color-secondary-900: #365314;
+  --color-secondary-950: #1a2e05;
+  
+  --color-accent: #84cc16;
+  --color-ring: #22c55e;
+}
+
+/* === VARIANTES DE TEMA DARK === */
+
+/* Tema Default Dark */
+.dark.theme-default {
+    --color-background: #0f172a;
+    --color-foreground: #f1f5f9;
+    --color-muted: #1e293b;
+    --color-muted-foreground: #94a3b8;
+    --color-border: #334155;
+    --color-accent: #94a3b8;
+    --color-ring: #94a3b8;
+  
+    /* Paleta primaria para dark (azules oscuros invertidos) */
+    --color-primary-50: #020617;
+    --color-primary-100: #0f172a;
+    --color-primary-200: #1e293b;
+    --color-primary-300: #334155;
+    --color-primary-400: #475569;
+    --color-primary-500: #64748b;
+    --color-primary-600: #94a3b8;
+    --color-primary-700: #cbd5e1;
+    --color-primary-800: #e2e8f0;
+    --color-primary-900: #f1f5f9;
+    --color-primary-950: #f8fafc;
+  
+    /* Paleta secundaria (gris neutro invertido) */
+    --color-secondary-50: #030712;
+    --color-secondary-100: #111827;
+    --color-secondary-200: #1f2937;
+    --color-secondary-300: #374151;
+    --color-secondary-400: #4b5563;
+    --color-secondary-500: #6b7280;
+    --color-secondary-600: #9ca3af;
+    --color-secondary-700: #d1d5db;
+    --color-secondary-800: #e5e7eb;
+    --color-secondary-900: #f3f4f6;
+    --color-secondary-950: #f9fafb;
+  }
+
+/* Tema Pink Dark - Dark Rose */
+.dark.theme-pink {
+  --color-background: #0c0a0b;
+  --color-foreground: #fce7f3;
+  --color-muted: #2d1b26;
+  --color-muted-foreground: #d4a5c2;
+  --color-border: #4a2c3a;
+  
+  /* Primarios invertidos y ajustados para dark rose */
+  --color-primary-50: #500724;
+  --color-primary-100: #831843;
+  --color-primary-200: #9d174d;
+  --color-primary-300: #be185d;
+  --color-primary-400: #db2777;
+  --color-primary-500: #ec4899;
+  --color-primary-600: #f472b6;
+  --color-primary-700: #f9a8d4;
+  --color-primary-800: #fbcfe8;
+  --color-primary-900: #fce7f3;
+  --color-primary-950: #fdf2f8;
+  
+  /* Secundarios ajustados */
+  --color-secondary-50: #4c0519;
+  --color-secondary-100: #881337;
+  --color-secondary-200: #9f1239;
+  --color-secondary-300: #be123c;
+  --color-secondary-400: #e11d48;
+  --color-secondary-500: #f43f5e;
+  --color-secondary-600: #fb7185;
+  --color-secondary-700: #fda4af;
+  --color-secondary-800: #fecdd3;
+  --color-secondary-900: #ffe4e6;
+  --color-secondary-950: #fff1f2;
+  
+  --color-accent: #f472b6;
+  --color-ring: #ec4899;
+}
+
+/* Tema Green Dark - Dark Emerald */
+.dark.theme-green {
+    --color-background: #0b1e12;              /* Más oscuro, sin parecer negro total */
+    --color-foreground: #e3fbe8;              /* Texto claro y legible */
+    --color-muted: #102a1d;                   /* Para tarjetas o secciones neutras */
+    --color-muted-foreground: #9fd8b6;        /* Texto secundario con buen contraste */
+    --color-border: #1e3a2a;                  /* Bordes sutiles pero visibles */
+  
+    /* Paleta primaria (verde esmeralda, adaptada para dark UI) */
+    --color-primary-50: #0f2f1e;
+    --color-primary-100: #1a4430;
+    --color-primary-200: #22603f;
+    --color-primary-300: #2d7b51;
+    --color-primary-400: #3ca466;
+    --color-primary-500: #4dd47e;
+    --color-primary-600: #6ff598;
+    --color-primary-700: #a7fbc1;
+    --color-primary-800: #cbfce0;
+    --color-primary-900: #e9fdf3;
+    --color-primary-950: #f5fef9;
+  
+    /* Paleta secundaria (verde lima más brillante para resaltar) */
+    --color-secondary-50: #1e3310;
+    --color-secondary-100: #324e17;
+    --color-secondary-200: #3d6c1e;
+    --color-secondary-300: #4e8d24;
+    --color-secondary-400: #63b12a;
+    --color-secondary-500: #81db34;
+    --color-secondary-600: #a7f44d;
+    --color-secondary-700: #cafb80;
+    --color-secondary-800: #e6fcc0;
+    --color-secondary-900: #f4fee3;
+    --color-secondary-950: #fafdF4;
+  
+    --color-accent: #4dd47e; /* Para iconos activos, sliders, botones destacados */
+    --color-ring: #3ca466;
+  }
+  
+
+/* Modo claro (por defecto) */
+.light {
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  --color-muted: #f8fafc;
+  --color-muted-foreground: #64748b;
+  --color-border: #e2e8f0;
+}
