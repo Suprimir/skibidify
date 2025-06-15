@@ -66,6 +66,25 @@ export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
               Esquema de colores
             </h2>
             <div className="flex gap-6">
+              <button
+                onClick={() => setAccent("default")}
+                className={`w-16 h-16 p-1 rounded-xl border-2 transition-all shadow-sm ${
+                  accent === "default"
+                    ? "border-slate-500 scale-105"
+                    : "border-transparent"
+                }`}
+              >
+                <div className="flex flex-col w-full h-full overflow-hidden rounded-md">
+                  <div className="flex flex-1">
+                    <div className="w-1/2 h-full bg-slate-50" />
+                    <div className="w-1/2 h-full bg-slate-300" />
+                  </div>
+                  <div className="flex flex-1">
+                    <div className="w-1/2 h-full bg-slate-500" />
+                    <div className="w-1/2 h-full bg-slate-800" />
+                  </div>
+                </div>
+              </button>
               {accents.map((option) => (
                 <button
                   key={option.toString()}
@@ -96,25 +115,6 @@ export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
                   </div>
                 </button>
               ))}
-              <button
-                onClick={() => setAccent("default")}
-                className={`w-16 h-16 p-1 rounded-xl border-2 transition-all shadow-sm ${
-                  accent === "default"
-                    ? "border-slate-500 scale-105"
-                    : "border-transparent"
-                }`}
-              >
-                <div className="flex flex-col w-full h-full overflow-hidden rounded-md">
-                  <div className="flex flex-1">
-                    <div className="`w-1/2 h-full bg-slate-50" />
-                    <div className="w-1/2 h-full bg-slate-200" />
-                  </div>
-                  <div className="flex flex-1">
-                    <div className="w-1/2 h-full bg-slate-500" />
-                    <div className="w-1/2 h-full bg-slate-800" />
-                  </div>
-                </div>
-              </button>
             </div>
           </div>
         </div>
