@@ -1,7 +1,16 @@
 import { Download, Home, Search, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import SettingsMenu from "./SettingsMenu";
+import { useState } from "react";
 
 export default function TopBar() {
+  const [settingsMenuVisible, setSettingsMenuVisible] =
+    useState<boolean>(false);
+
+  const handleSettingsMenu = () => {
+    setSettingsMenuVisible(true);
+  };
+
   const navigate = useNavigate();
 
   return (
@@ -39,10 +48,18 @@ export default function TopBar() {
             <Download className="w-5 h-5 text-primary-600" />
           </button>
         </div>
-        <button className="flex items-center justify-center transition-all duration-200 border rounded-full shadow-sm bg-primary-200/70 hover:bg-primary-200/90 hover:shadow-md hover:scale-105 active:scale-95 border-primary-200/50">
+        <button
+          onClick={handleSettingsMenu}
+          className="flex items-center justify-center transition-all duration-200 border rounded-full shadow-sm bg-primary-200/70 hover:bg-primary-200/90 hover:shadow-md hover:scale-105 active:scale-95 border-primary-200/50"
+        >
           <Settings className="p-3 text-primary-600 w-13 h-13 group-hover:text-primary-700" />
         </button>
       </div>
+
+      <SettingsMenu
+        visible={settingsMenuVisible}
+        onClose={() => setSettingsMenuVisible(false)}
+      />
     </div>
   );
 }

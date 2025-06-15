@@ -14,7 +14,7 @@ export default function Layout() {
       {/* Contenido - Sidebar + Outlet */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar - Fijado hacia la izquierda con colapso */}
-        <div className="z-20 flex-shrink-0">
+        <div className="flex-shrink-0">
           <Sidebar />
         </div>
 
@@ -27,7 +27,7 @@ export default function Layout() {
       </div>
 
       {/* PlayerBar - Fijado en parte inferior */}
-      <div className="z-30 flex-shrink-0">
+      <div className="flex-shrink-0">
         <PlayerBar />
       </div>
     </div>
