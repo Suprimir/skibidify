@@ -1,117 +1,99 @@
+// song.service.ts
 import ytdlp from "yt-dlp-exec";
 import path from "path";
 import fs from "fs";
 import ffmpegPath from "ffmpeg-static";
-import { RequestHandler } from "express";
 import { YouTubeSearchItem } from "../../types/YoutubeSearch";
 import { Song } from "../../types/Song";
 
-export const getSongs: RequestHandler = (req, res) => {
-  const documentsDir = path.join(process.cwd(), "public", "songs");
-  const songsJsonPath = path.join(documentsDir, "songs.json");
+const documentsDir = path.join(process.cwd(), "public", "songs");
+const songsJsonPath = path.join(documentsDir, "songs.json");
 
-  try {
-    if (!fs.existsSync(documentsDir)) {
-      fs.mkdirSync(documentsDir, { recursive: true });
-    }
-
-    let songs: Song[] = [];
-    if (fs.existsSync(songsJsonPath)) {
-      const jsonData = fs.readFileSync(songsJsonPath, "utf8");
-      songs = JSON.parse(jsonData);
-    }
-
-    res.status(200).send(songs);
-  } catch (error) {
-    res.status(500).send(error);
+const ensureSongsDirExists = () => {
+  if (!fs.existsSync(documentsDir)) {
+    fs.mkdirSync(documentsDir, { recursive: true });
   }
 };
 
-export const addSong = (youtubeItem: YouTubeSearchItem) => {
-  const documentsDir = path.join(process.cwd(), "public", "songs");
-  const songsJsonPath = path.join(documentsDir, "songs.json");
-
-  try {
-    if (!fs.existsSync(documentsDir)) {
-      fs.mkdirSync(documentsDir, { recursive: true });
-    }
-
-    let songs: Song[] = [];
-    if (fs.existsSync(songsJsonPath)) {
-      const jsonData = fs.readFileSync(songsJsonPath, "utf8");
-      songs = JSON.parse(jsonData);
-    }
-
-    const existingSong = songs.find(
-      (song) => song.id === youtubeItem.id.videoId
-    );
-    if (existingSong) {
-      console.log(
-        `La canción "${youtubeItem.snippet.title}" ya existe en la lista`
-      );
-      return { success: false, message: "Song already exists" };
-    }
-
-    const relativePath = `/public/songs/${youtubeItem.snippet.title}.mp3`;
-
-    const newSong: Song = {
-      id: youtubeItem.id.videoId ?? "",
-      title: youtubeItem.snippet.title,
-      channelTitle: youtubeItem.snippet.channelTitle,
-      description: youtubeItem.snippet.description,
-      thumbnailUrl: youtubeItem.snippet.thumbnails?.default?.url,
-      filePath: relativePath,
-      addedAt: new Date().toISOString(),
-    };
-
-    songs.push(newSong);
-
-    fs.writeFileSync(songsJsonPath, JSON.stringify(songs, null, 2), "utf8");
-
-    console.log(`Canción "${newSong.title}" agregada exitosamente al JSON`);
-  } catch (error) {
-    console.error("Error al agregar la canción al JSON:", error);
-  }
+export const getAllSongs = (): Song[] => {
+  ensureSongsDirExists();
+  if (!fs.existsSync(songsJsonPath)) return [];
+  const jsonData = fs.readFileSync(songsJsonPath, "utf8");
+  return JSON.parse(jsonData);
 };
 
-export const downloadSong: RequestHandler = async (req, res) => {
-  const youtubeItem = req.body.youtubeItem as YouTubeSearchItem;
+export const saveSongs = (songs: Song[]) => {
+  fs.writeFileSync(songsJsonPath, JSON.stringify(songs, null, 2), "utf8");
+};
 
-  if (!youtubeItem.id.videoId) {
-    res.status(400).json({ error: "Missing videoId" });
-    return;
+export const addSong = (
+  youtubeItem: YouTubeSearchItem
+): { success: boolean; message: string } => {
+  ensureSongsDirExists();
+
+  const songs = getAllSongs();
+
+  const exists = songs.find((s) => s.id === youtubeItem.id.videoId);
+  if (exists) return { success: false, message: "Song already exists" };
+
+  const relativePath = `/songs/${youtubeItem.snippet.title}.mp3`;
+
+  const newSong: Song = {
+    id: youtubeItem.id.videoId ?? "",
+    title: youtubeItem.snippet.title,
+    channelTitle: youtubeItem.snippet.channelTitle,
+    description: youtubeItem.snippet.description,
+    thumbnailUrl: youtubeItem.snippet.thumbnails?.default?.url,
+    filePath: relativePath,
+    addedAt: new Date().toISOString(),
+  };
+
+  songs.push(newSong);
+  saveSongs(songs);
+
+  return { success: true, message: "Song added" };
+};
+
+export const deleteSongById = (
+  songId: string
+): { success: boolean; message: string } => {
+  ensureSongsDirExists();
+
+  let songs = getAllSongs();
+  const song = songs.find((s) => s.id === songId);
+
+  if (!song) return { success: false, message: "Song not found" };
+
+  try {
+    fs.unlinkSync(path.join(process.cwd(), "public", song.filePath));
+  } catch (e) {
+    console.error("Error deleting file:", e);
   }
 
+  songs = songs.filter((s) => s.id !== songId);
+  saveSongs(songs);
+
+  return { success: true, message: "Song deleted" };
+};
+
+export const downloadSongToDisk = async (
+  youtubeItem: YouTubeSearchItem
+): Promise<string> => {
+  ensureSongsDirExists();
   const url = `https://www.youtube.com/watch?v=${youtubeItem.id.videoId}`;
-
-  const documentsDir = path.join(process.cwd(), "public", "songs");
   const outputPath = path.join(
     documentsDir,
     `${youtubeItem.snippet.title}.mp3`
   );
 
-  try {
-    if (!fs.existsSync(documentsDir)) {
-      fs.mkdirSync(documentsDir, { recursive: true });
-    }
+  await ytdlp(url, {
+    format: "bestaudio",
+    extractAudio: true,
+    audioFormat: "mp3",
+    audioQuality: 0,
+    output: outputPath,
+    ffmpegLocation: ffmpegPath ?? undefined,
+  });
 
-    await ytdlp(url, {
-      format: "bestaudio",
-      extractAudio: true,
-      audioFormat: "mp3",
-      audioQuality: 0,
-      output: outputPath,
-      ffmpegLocation: ffmpegPath ?? undefined,
-    });
-
-    addSong(youtubeItem);
-
-    res.status(200).json({
-      message: "Descarga completada",
-      savedTo: outputPath,
-    });
-  } catch (err) {
-    console.error("Download error:", err);
-    res.status(500).json({ error: "Failed to download audio" });
-  }
+  return outputPath;
 };
