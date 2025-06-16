@@ -13,6 +13,8 @@ export default function PlayerBar() {
     setVolume,
     handlePause,
     handleSeek,
+    playNext,
+    playPrev,
     duration,
     currentTime,
     paused,
@@ -53,7 +55,10 @@ export default function PlayerBar() {
 
         <div className="flex flex-col items-center justify-center flex-1 space-y-3">
           <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
-            <button className="p-2 sm:p-2.5 bg-primary-200/70 rounded-full hover:bg-primary-200/90 transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105 active:scale-95 border border-primary-200/50">
+            <button
+              onClick={playPrev}
+              className="p-2 sm:p-2.5 bg-primary-200/70 rounded-full hover:bg-primary-200/90 transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105 active:scale-95 border border-primary-200/50"
+            >
               <ArrowLeft className="w-5 h-5 text-primary-600 sm:w-6 sm:h-6 lg:w-7 lg:h-7" />
             </button>
             <button
@@ -66,7 +71,10 @@ export default function PlayerBar() {
                 <Pause className="w-6 h-6 text-primary-600 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
               )}
             </button>
-            <button className="p-2 sm:p-2.5 bg-primary-200/70 rounded-full hover:bg-primary-200/90 transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105 active:scale-95 border border-primary-200/50">
+            <button
+              onClick={playNext}
+              className="p-2 sm:p-2.5 bg-primary-200/70 rounded-full hover:bg-primary-200/90 transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105 active:scale-95 border border-primary-200/50"
+            >
               <ArrowRight className="w-5 h-5 text-primary-600 sm:w-6 sm:h-6 lg:w-7 lg:h-7" />
             </button>
           </div>

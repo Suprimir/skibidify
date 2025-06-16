@@ -49,7 +49,7 @@ export default function SongCard({ song }: SongCardProps) {
           </div>
           <button
             onClick={() => handlePlay(song)}
-            className="flex items-center justify-center gap-2 my-auto font-bold transition-all border rounded-full shadow-md cursor-pointer bg-gradient-to-r from-primary-500 to-primary-500 hover:from-primary-600 hover:to-primary-600 me-4 hover:shadow-lg hover:scale-110 active:scale-95 border-primary-300/50"
+            className="flex items-center justify-center gap-2 my-auto font-bold transition-all border rounded-full shadow-md cursor-pointer bg-primary-500 hover:bg-primary-600 me-4 hover:shadow-lg hover:scale-110 active:scale-95 border-primary-300/50"
           >
             <Play className="w-12 h-12 p-3 text-primary-50 drop-shadow-sm" />
           </button>

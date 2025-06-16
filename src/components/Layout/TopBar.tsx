@@ -1,6 +1,6 @@
 import { Download, Home, Search, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import SettingsMenu from "./SettingsMenu";
+import SettingsMenu from "../SettingsMenu";
 import { useState } from "react";
 
 export default function TopBar() {

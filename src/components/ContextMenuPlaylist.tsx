@@ -1,0 +1,61 @@
+import { useSongs } from "@Contexts/SongContext";
+import type { Playlist } from "@Types/Song";
+import { Trash2 } from "lucide-react";
+import { useEffect, useRef } from "react";
+
+interface ContextMenuPlaylistProps {
+  x: number;
+  y: number;
+  visible: boolean;
+  onClose: () => void;
+  playlist: Playlist;
+}
+
+export default function ContextMenuPlaylist({
+  x,
+  y,
+  visible,
+  onClose,
+  playlist,
+}: ContextMenuPlaylistProps) {
+  const menuRef = useRef<HTMLDivElement>(null);
+  const { deletePlaylist } = useSongs();
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose]);
+
+  if (!visible) return null;
+
+  const handleDelete = () => {
+    deletePlaylist(playlist.id);
+    onClose();
+  };
+
+  return (
+    <div
+      ref={menuRef}
+      style={{ top: y, left: x }}
+      className="fixed z-50 p-2 border rounded-md shadow-lg bg-primary-200 border-primary-300 w-52"
+    >
+      <p className="px-2 py-1 text-xs font-medium text-primary-700">
+        {playlist.name || "Sin título"}
+      </p>
+      <ul className="mt-1 text-sm text-primary-700">
+        <li
+          onClick={handleDelete}
+          className="flex items-center gap-2 p-2 rounded cursor-pointer text-primary-700 hover:bg-primary-300/50"
+        >
+          <Trash2 className="w-4 h-4" />
+          Eliminar
+        </li>
+      </ul>
+    </div>
+  );
+}

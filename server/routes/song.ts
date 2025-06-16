@@ -8,6 +8,7 @@ import {
 const router = express.Router();
 
 router.get("/", getSongs);
+
 router.post("/download", downloadSong);
 router.post("/delete", deleteSong);
 

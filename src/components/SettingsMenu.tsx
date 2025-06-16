@@ -11,22 +11,48 @@ type ThemeAccent = "pink" | "green" | "default";
 
 export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
   const [mounted, setMounted] = useState(false);
+  const [showing, setShowing] = useState(false);
   const { setAccent, toggleMode, theme } = useTheme();
 
   const [mode, accent] = theme.split("-");
 
   const accents: ThemeAccent[] = ["pink", "green"];
 
-  useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
+  const accentClasses: Record<ThemeAccent, string[]> = {
+    pink: ["bg-pink-50", "bg-pink-200", "bg-pink-500", "bg-pink-800"],
+    green: ["bg-green-50", "bg-green-200", "bg-green-500", "bg-green-800"],
+    default: ["bg-slate-50", "bg-slate-200", "bg-slate-500", "bg-slate-800"],
+  };
 
-  if (!visible || !mounted) return null;
+  useEffect(() => {
+    if (visible) {
+      setMounted(true);
+    } else {
+      setShowing(false);
+      const timeout = setTimeout(() => setMounted(false), 300);
+      return () => clearTimeout(timeout);
+    }
+  }, [visible]);
+
+  useEffect(() => {
+    if (mounted) {
+      requestAnimationFrame(() => setShowing(true));
+    }
+  }, [mounted]);
+
+  if (!mounted) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="w-[70vw] max-w-3xl h-[70vh] bg-primary-100 shadow-xl rounded-2xl overflow-hidden flex flex-col">
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center 
+    bg-black/40 backdrop-blur-sm transition-opacity duration-300
+    ${showing ? "opacity-100" : "opacity-0"}`}
+    >
+      <div
+        className={`w-[70vw] max-w-3xl h-[70vh] bg-primary-100 shadow-xl rounded-2xl overflow-hidden flex flex-col
+      transform transition-all duration-300
+      ${showing ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}
+      >
         <div className="flex items-center justify-between px-6 py-4 border-b bg-primary-200 border-primary-300">
           <h1 className="text-2xl font-semibold text-primary-600">
             Configuración
@@ -60,7 +86,7 @@ export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
             </div>
           </div>
 
-          {/* Color Accent */}
+          {/* Esquemas de colores */}
           <div>
             <h2 className="mb-3 text-lg font-medium text-primary-600">
               Esquema de colores
@@ -98,18 +124,18 @@ export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
                   <div className="flex flex-col w-full h-full overflow-hidden rounded-md">
                     <div className="flex flex-1">
                       <div
-                        className={`w-1/2 h-full bg-${option.toString()}-50`}
+                        className={`w-1/2 h-full ${accentClasses[option][0]}`}
                       />
                       <div
-                        className={`w-1/2 h-full bg-${option.toString()}-200`}
+                        className={`w-1/2 h-full ${accentClasses[option][1]}`}
                       />
                     </div>
                     <div className="flex flex-1">
                       <div
-                        className={`w-1/2 h-full bg-${option.toString()}-500`}
+                        className={`w-1/2 h-full ${accentClasses[option][2]}`}
                       />
                       <div
-                        className={`w-1/2 h-full bg-${option.toString()}-800`}
+                        className={`w-1/2 h-full ${accentClasses[option][3]}`}
                       />
                     </div>
                   </div>
@@ -120,6 +146,7 @@ export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
         </div>
       </div>
     </div>,
+    // Lo renderiza en el root del index.html para evitar problemas con los demas componentes en pantalla
     document.getElementById("root")!
   );
 }

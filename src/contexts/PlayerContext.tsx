@@ -1,6 +1,7 @@
 import type { Song } from "@Types/Song";
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -10,9 +11,12 @@ import {
 
 interface PlayerContextType {
   handlePlay: (song: Song) => void;
+  setQueue: (songs: Song[]) => void;
   handlePause: () => void;
   handleSeek: (time: number) => void;
   setVolume: (volume: number) => void;
+  playNext: () => void;
+  playPrev: () => void;
   duration: number;
   paused: boolean;
   currentTime: number;
@@ -22,9 +26,12 @@ interface PlayerContextType {
 
 const defaultPlayerContext: PlayerContextType = {
   handlePlay: () => {},
+  setQueue: () => {},
   handlePause: () => {},
   handleSeek: () => {},
   setVolume: () => {},
+  playNext: () => {},
+  playPrev: () => {},
   duration: 0,
   paused: true,
   currentTime: 0,
@@ -35,13 +42,78 @@ const defaultPlayerContext: PlayerContextType = {
 const PlayerContext = createContext<PlayerContextType>(defaultPlayerContext);
 
 export function PlayerContextProvider({ children }: { children: ReactNode }) {
+  const [songQueue, setSongQueue] = useState<Song[] | null>(null);
   const [songPlaying, setSongPlaying] = useState<Song | null>(null);
   const [duration, setDuration] = useState<number>(0);
   const [paused, setPaused] = useState(true);
   const [volume, setVolumeState] = useState<number>(0.5);
   const [currentTime, setCurrentTime] = useState(0);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(new Audio());
+
+  const playNext = useCallback(() => {
+    const audio = audioRef.current;
+    if (!songQueue || !songPlaying) return;
+
+    const currentIndex = songQueue.findIndex((s) => s.id === songPlaying.id);
+    const nextSong = songQueue[currentIndex + 1];
+
+    if (nextSong) {
+      handlePlay(nextSong);
+    } else {
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
+      setPaused(true);
+      setSongPlaying(null);
+      setCurrentTime(0);
+      setDuration(0);
+    }
+  }, [songQueue, songPlaying]);
+
+  const playPrev = useCallback(() => {
+    const audio = audioRef.current;
+    if (!songQueue || !songPlaying || !audio) return;
+
+    const currentIndex = songQueue.findIndex((s) => s.id === songPlaying.id);
+
+    if (audio.currentTime > 30 || currentIndex <= 0) {
+      audio.currentTime = 0;
+      setCurrentTime(0);
+    } else {
+      const prevSong = songQueue[currentIndex - 1];
+      if (prevSong) {
+        handlePlay(prevSong);
+      }
+    }
+  }, [songQueue, songPlaying]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleEnded = () => {
+      playNext();
+    };
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+
+    const handleMetadata = () => {
+      setDuration(audio.duration);
+    };
+
+    audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("loadedmetadata", handleMetadata);
+
+    return () => {
+      audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("loadedmetadata", handleMetadata);
+    };
+  }, [playNext]);
 
   const setVolume = (value: number) => {
     setVolumeState(value);
@@ -51,33 +123,32 @@ export function PlayerContextProvider({ children }: { children: ReactNode }) {
   };
 
   const handlePlay = (song: Song) => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
+    const audio = audioRef.current;
+    if (!audio) return;
 
-    const newAudio = new Audio(song.filePath);
-    audioRef.current = newAudio;
+    audio.pause();
+    audio.src = song.filePath;
+    audio.load();
+    audio.volume = volume;
+
     setSongPlaying(song);
     setPaused(false);
-    newAudio.volume = volume;
 
-    newAudio.addEventListener("loadedmetadata", () => {
-      setDuration(newAudio.duration);
-    });
-
-    newAudio.addEventListener("ended", () => {
-      setPaused(true);
-      setCurrentTime(0);
-    });
-
-    newAudio.play().catch((err) => {
+    audio.play().catch((err) => {
       console.error("Playback failed:", err);
       setPaused(true);
     });
   };
 
+  const setQueue = (songs: Song[]) => {
+    setSongQueue(songs);
+    if (songs.length > 0) {
+      handlePlay(songs[0]);
+    }
+  };
+
   const handlePause = () => {
-    if (!audioRef.current) return;
+    if (!audioRef.current.src) return;
     if (audioRef.current.paused) {
       audioRef.current.play();
       setPaused(false);
@@ -94,25 +165,14 @@ export function PlayerContextProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const updateTime = () => {
-      setCurrentTime(audio.currentTime);
-    };
-
-    audio.addEventListener("timeupdate", updateTime);
-    return () => {
-      audio.removeEventListener("timeupdate", updateTime);
-    };
-  }, [songPlaying]);
-
   const value: PlayerContextType = {
     handlePlay,
+    setQueue,
     handlePause,
     handleSeek,
     setVolume,
+    playNext,
+    playPrev,
     duration,
     paused,
     currentTime,

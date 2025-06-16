@@ -1,6 +1,6 @@
 @import "tailwindcss";
+@plugin "tailwind-scrollbar";
 
-/* === CONFIGURACIÓN @THEME PARA TAILWIND 4 === */
 @theme {
   /* Colores base que cambiarán según el tema */
   --color-background: #ffffff;
@@ -179,11 +179,11 @@
 
 /* Tema Green Dark - Dark Emerald */
 .dark.theme-green {
-    --color-background: #0b1e12;              /* Más oscuro, sin parecer negro total */
-    --color-foreground: #e3fbe8;              /* Texto claro y legible */
-    --color-muted: #102a1d;                   /* Para tarjetas o secciones neutras */
-    --color-muted-foreground: #9fd8b6;        /* Texto secundario con buen contraste */
-    --color-border: #1e3a2a;                  /* Bordes sutiles pero visibles */
+    --color-background: #0b1e12;           
+    --color-foreground: #e3fbe8;        
+    --color-muted: #102a1d;                   
+    --color-muted-foreground: #9fd8b6;       
+    --color-border: #1e3a2a;               
   
     /* Paleta primaria (verde esmeralda, adaptada para dark UI) */
     --color-primary-50: #0f2f1e;
@@ -223,4 +223,10 @@
   --color-muted: #f8fafc;
   --color-muted-foreground: #64748b;
   --color-border: #e2e8f0;
+}
+
+@layer utilities {
+  * {
+    @apply scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent;
+  }
 }

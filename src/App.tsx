@@ -5,6 +5,7 @@ import "./App.css";
 import Test from "./pages/Test";
 import DownloadPage from "./pages/DownloadPage";
 import LibraryPage from "./pages/LibraryPage";
+import PlaylistPage from "./pages/PlaylistPage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="home" element={<Home />} />
           <Route path="download" element={<DownloadPage />} />
           <Route path="library" element={<LibraryPage />} />
+          <Route path="playlist" element={<PlaylistPage />} />
           <Route path="test" element={<Test />} />
         </Route>
       </Routes>

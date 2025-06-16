@@ -7,3 +7,9 @@ export interface Song {
   filePath: string;
   addedAt: string;
 }
+
+export interface Playlist {
+  id: string;
+  name: string;
+  songs: string[];
+}
