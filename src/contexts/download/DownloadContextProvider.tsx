@@ -310,11 +310,6 @@ export const DownloadProvider = ({ children }: { children: ReactNode }) => {
           <div className="bg-primary-500 text-white p-4 rounded-full shadow-lg flex items-center gap-3 cursor-pointer hover:bg-primary-600 transition-all hover:scale-105">
             <div className="relative">
               <Download className="w-6 h-6" />
-              {downloadingQueue.length > 0 && (
-                <div className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
-                  {downloadingQueue.length}
-                </div>
-              )}
             </div>
           </div>
         </div>

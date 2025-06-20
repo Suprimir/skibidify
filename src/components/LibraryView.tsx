@@ -8,7 +8,7 @@ export default function LibraryView() {
   const { setQueue, setShuffleQueue } = usePlayer();
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+    <div className="p-4 w-full">
       <div className="flex flex-col sm:flex-row items-center w-full border shadow-lg bg-primary-100 rounded-2xl border-primary-200/50 backdrop-blur-sm mb-6">
         <div className="flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 lg:w-36 lg:h-36 m-4 sm:m-6 transition-all border shadow-md rounded-3xl bg-primary-300/70 hover:bg-primary-300/50 border-primary-200/50 backdrop-blur-sm flex-shrink-0">
           <Library className="w-10 h-10 sm:w-16 sm:h-16 lg:w-24 lg:h-24 transition-all text-primary-600 drop-shadow-sm" />

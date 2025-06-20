@@ -35,12 +35,11 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+    <div className="p-4 w-full">
       <h1 className="text-2xl sm:text-3xl lg:text-4xl text-primary-600 font-bold border-b-2 border-primary-300 mb-4 sm:mb-6">
         Playlists
       </h1>
 
-      {/* Responsive Grid for Playlists */}
       <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 mb-8 sm:mb-12">
         {playlists.slice(0, 5).map((playlist) => (
           <div
@@ -52,7 +51,6 @@ export default function HomePage() {
             onClick={() => navigate(`/playlist?id=${playlist.id}`)}
             className="cursor-pointer group w-full"
           >
-            {/* Playlist Image Container */}
             <div className="bg-primary-100 border-primary-200 w-full aspect-square overflow-hidden shadow-md p-4 sm:p-6 rounded-t-2xl group-hover:bg-primary-200 transition-colors duration-200">
               {playlist.image ? (
                 <div className="w-full h-full rounded-xl overflow-hidden transition-transform duration-200 group-hover:scale-110">
@@ -69,7 +67,6 @@ export default function HomePage() {
               )}
             </div>
 
-            {/* Playlist Info */}
             <div className="bg-primary-200/60 rounded-b-xl shadow-md p-3 sm:p-4 group-hover:bg-primary-300/80 transition-colors duration-200">
               <h2 className="text-primary-600 text-sm sm:text-base lg:text-lg xl:text-xl font-bold truncate">
                 {playlist.name}
@@ -87,7 +84,6 @@ export default function HomePage() {
         Recently Added
       </h1>
 
-      {/* Songs List */}
       <div className="pb-8 space-y-2 sm:space-y-4">
         {songs
           .sort(

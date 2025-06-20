@@ -44,7 +44,7 @@ export default function PlaylistView({ id }: PlaylistViewProps) {
 
   if (!playlist.id) {
     return (
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+      <div className="p-4 w-full">
         <div className="text-center py-12">
           <Music className="w-16 h-16 sm:w-20 sm:h-20 text-primary-300 mx-auto mb-4" />
           <p className="text-lg sm:text-xl text-primary-500 font-medium">
@@ -59,7 +59,7 @@ export default function PlaylistView({ id }: PlaylistViewProps) {
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+    <div className="p-4 w-full">
       <div className="mb-6">
         <HeaderPlaylist key={playlist.id} playlist={playlist} />
       </div>

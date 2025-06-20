@@ -35,6 +35,10 @@ export default function SongCard({
   return (
     <>
       <div
+        onDoubleClick={(e) => {
+          e.stopPropagation();
+          handlePlay(song);
+        }}
         onContextMenu={handleContextMenu}
         className="flex w-full p-3 sm:p-4 space-x-3 sm:space-x-5 transition-all border shadow-md rounded-xl bg-primary-50 backdrop-blur-sm border-primary-200/50 hover:shadow-lg hover:bg-primary-200/90 group cursor-pointer"
       >
