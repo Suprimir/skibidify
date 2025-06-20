@@ -27,7 +27,8 @@ export default function SearchBar({ submit }: SearchBarProps) {
       <input
         id="searchBarInput"
         className="w-full p-2 text-2xl focus:outline-0 placeholder:text-primary-400 text-primary-600 font-semibold"
-        placeholder="Search.."
+        placeholder="Search..."
+        spellCheck="false"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />

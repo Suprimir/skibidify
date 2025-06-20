@@ -6,10 +6,12 @@ export interface Song {
   thumbnailUrl?: string;
   filePath: string;
   addedAt: string;
+  favorite: boolean;
 }
 
 export interface Playlist {
   id: string;
+  image: string;
   name: string;
   songs: string[];
 }

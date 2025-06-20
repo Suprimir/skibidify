@@ -1,22 +1,9 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { ThemeContext } from "./themeContext";
 
 type ThemeMode = "light" | "dark";
 type ThemeAccent = "pink" | "green" | "default";
 type Theme = `${ThemeMode}-${ThemeAccent}`;
-
-interface ThemeContextProps {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-  toggleMode: () => void;
-  setAccent: (accent: ThemeAccent) => void;
-}
-
-const ThemeContext = createContext<ThemeContextProps>({
-  theme: "light-default",
-  setTheme: () => {},
-  toggleMode: () => {},
-  setAccent: () => {},
-});
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
@@ -59,5 +46,3 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     </ThemeContext.Provider>
   );
 }
-
-export const useTheme = () => useContext(ThemeContext);

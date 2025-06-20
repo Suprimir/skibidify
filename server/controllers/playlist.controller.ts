@@ -3,7 +3,9 @@ import {
   addPlaylistToJSON,
   addSongToPlaylistJSON,
   deletePlaylistFromJSON,
+  deleteSongFromPlaylistJSON,
   getAllPlaylists,
+  updatePlaylistFromJSON,
 } from "../services/playlist.service";
 
 export const getPlaylists: RequestHandler = (req, res) => {
@@ -21,6 +23,26 @@ export const addPlaylist: RequestHandler = (req, res) => {
     res.status(200).json(data);
   } catch {
     res.status(500).json({ error: "Failed to add playlist" });
+  }
+};
+
+export const updatePlaylist: RequestHandler = async (req, res) => {
+  const { playlistId } = req.params;
+  const { name } = req.body;
+
+  if (!playlistId) {
+    res.status(400).json({ error: "PlaylistId is required" });
+  }
+
+  try {
+    let imagePath: string | undefined;
+    if (req.file) {
+      imagePath = req.file.path;
+    }
+    const data = await updatePlaylistFromJSON(playlistId, imagePath, name);
+    res.status(200).json(data);
+  } catch {
+    res.status(500).json({ error: "Failed to update playlist" });
   }
 };
 
@@ -42,5 +64,17 @@ export const addSongToPlaylist: RequestHandler = (req, res) => {
     res.status(200).json(data);
   } catch {
     res.status(500).json({ error: "Failed to add song to playlist" });
+  }
+};
+
+export const deleteSongFromPlaylist: RequestHandler = (req, res) => {
+  const { playlistId } = req.params;
+  const { songId } = req.body;
+
+  try {
+    const data = deleteSongFromPlaylistJSON(playlistId, songId);
+    res.status(200).json(data);
+  } catch {
+    res.status(500).json({ error: "Failed to remove song to playlist" });
   }
 };

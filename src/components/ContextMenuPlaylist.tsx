@@ -1,5 +1,5 @@
-import { useSongs } from "@Contexts/SongContext";
-import type { Playlist } from "@Types/Song";
+import { useSongs } from "@/contexts/song";
+import type { Playlist } from "@/types/Song";
 import { Trash2 } from "lucide-react";
 import { useEffect, useRef } from "react";
 

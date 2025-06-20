@@ -1,25 +1,10 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import type { Playlist, Song } from "@Types/Song";
-import type { YouTubeSearchItem } from "@Types/YoutubeSearch";
-
-interface SongContextType {
-  songs: Song[];
-  playlists: Playlist[];
-  downloadingId: string | null;
-  refreshSongs: () => void;
-  deleteSong: (id: string) => Promise<void>;
-  addPlaylist: () => Promise<void>;
-  deletePlaylist: (id: string) => Promise<void>;
-  addSongToPlaylist: (songId: string, playlistId: string) => Promise<void>;
-  downloadSong: (youtubeItem: YouTubeSearchItem) => Promise<void>;
-}
-
-const SongContext = createContext<SongContextType | null>(null);
+import type { Playlist, Song } from "@/types/Song";
+import { useEffect, useState } from "react";
+import { SongContext } from "./songContext";
 
 export const SongProvider = ({ children }: { children: React.ReactNode }) => {
   const [songs, setSongs] = useState<Song[]>([]);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   const refreshSongs = async () => {
     const res = await fetch("/api/songs");
@@ -41,7 +26,8 @@ export const SongProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     if (res.ok) {
-      setSongs((prev) => prev.filter((s) => s.id !== id)); // actualiza localmente
+      refreshSongs();
+      refreshPlaylists();
     } else {
       console.error("Error al eliminar la canción");
     }
@@ -93,16 +79,36 @@ export const SongProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const downloadSong = async (youtubeItem: YouTubeSearchItem) => {
-    const id = youtubeItem.id.videoId;
-    if (!id) return;
+  const updatePlaylist = async (
+    playlistId: string,
+    name?: string,
+    imageFile?: File
+  ) => {
+    const formData = new FormData();
 
-    setDownloadingId(id);
+    if (name) {
+      formData.append("name", name);
+    }
 
-    const res = await fetch("/api/songs/download", {
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
+
+    const res = await fetch("/api/playlists/" + playlistId, {
+      method: "PUT",
+      body: formData,
+    });
+
+    if (res.ok) {
+      refreshPlaylists();
+    } else {
+      console.error("Error al actualizar la playlist");
+    }
+  };
+
+  const markAsFavorite = async (songId: string) => {
+    const res = await fetch(`/api/songs/favorite/${songId}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ youtubeItem }),
     });
 
     if (res.ok) {
@@ -110,8 +116,20 @@ export const SongProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       console.error("Error al obtener las canciones");
     }
+  };
 
-    setDownloadingId(null);
+  const removeSongFromPlaylist = async (playlistId: string, songId: string) => {
+    const res = await fetch(`/api/playlists/song/${playlistId}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ songId }),
+    });
+
+    if (res.ok) {
+      await refreshPlaylists();
+    } else {
+      console.error("Error al obtener las canciones");
+    }
   };
 
   useEffect(() => {
@@ -124,22 +142,17 @@ export const SongProvider = ({ children }: { children: React.ReactNode }) => {
       value={{
         songs,
         playlists,
-        downloadingId,
         refreshSongs,
         deleteSong,
-        downloadSong,
         addPlaylist,
         deletePlaylist,
         addSongToPlaylist,
+        updatePlaylist,
+        markAsFavorite,
+        removeSongFromPlaylist,
       }}
     >
       {children}
     </SongContext.Provider>
   );
-};
-
-export const useSongs = () => {
-  const context = useContext(SongContext);
-  if (!context) throw new Error("useSongs must be used within SongProvider");
-  return context;
 };

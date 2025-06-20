@@ -2,10 +2,11 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./pages/Layout";
 import Home from "./pages/Home";
 import "./App.css";
-import Test from "./pages/Test";
 import DownloadPage from "./pages/DownloadPage";
 import LibraryPage from "./pages/LibraryPage";
 import PlaylistPage from "./pages/PlaylistPage";
+import FavoritesPage from "./pages/FavoritesPage";
+import SearchPage from "./pages/SearchPage";
 
 function App() {
   return (
@@ -17,7 +18,8 @@ function App() {
           <Route path="download" element={<DownloadPage />} />
           <Route path="library" element={<LibraryPage />} />
           <Route path="playlist" element={<PlaylistPage />} />
-          <Route path="test" element={<Test />} />
+          <Route path="favorites" element={<FavoritesPage />} />
+          <Route path="search" element={<SearchPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

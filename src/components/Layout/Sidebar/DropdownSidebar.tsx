@@ -1,4 +1,4 @@
-import { useSongs } from "@Contexts/SongContext";
+import { useSongs } from "@/contexts/song";
 import { Music, PlusCircle } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 

@@ -1,7 +1,8 @@
 import { createPortal } from "react-dom";
 import { useEffect, useState } from "react";
-import { Moon, Sun, X } from "lucide-react";
-import { useTheme } from "@Contexts/ThemeContext";
+import { Moon, Save, Sun, X, Eye, EyeOff } from "lucide-react";
+import { useTheme } from "@/contexts/theme";
+import { useApiKeys } from "src/hooks/useApiKeys";
 
 interface SettingsMenuProps {
   visible: boolean;
@@ -13,6 +14,10 @@ export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
   const [mounted, setMounted] = useState(false);
   const [showing, setShowing] = useState(false);
   const { setAccent, toggleMode, theme } = useTheme();
+  const [showYouTubeKey, setShowYouTubeKey] = useState(false);
+  const { setApiKey, getApiKey } = useApiKeys();
+
+  const [youtubeInput, setYoutubeInput] = useState("");
 
   const [mode, accent] = theme.split("-");
 
@@ -26,6 +31,7 @@ export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
 
   useEffect(() => {
     if (visible) {
+      loadApiKeys();
       setMounted(true);
     } else {
       setShowing(false);
@@ -39,6 +45,18 @@ export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
       requestAnimationFrame(() => setShowing(true));
     }
   }, [mounted]);
+
+  const loadApiKeys = async () => {
+    const youtubeKey = await getApiKey("YouTube");
+
+    if (youtubeKey) setYoutubeInput(youtubeKey);
+  };
+
+  const handleSaveYoutube = async () => {
+    if (youtubeInput.trim()) {
+      setApiKey("YouTube", youtubeInput.trim());
+    }
+  };
 
   if (!mounted) return null;
 
@@ -54,9 +72,7 @@ export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
       ${showing ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b bg-primary-200 border-primary-300">
-          <h1 className="text-2xl font-semibold text-primary-600">
-            Configuración
-          </h1>
+          <h1 className="text-2xl font-semibold text-primary-600">Settings</h1>
           <button
             onClick={onClose}
             className="p-2 transition-transform rounded-xl hover:scale-110 hover:bg-primary-100"
@@ -66,12 +82,12 @@ export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
         </div>
         <div className="flex flex-col gap-8 p-6 overflow-y-auto">
           <div>
-            <h2 className="mb-3 text-lg font-medium text-primary-600">Modo</h2>
+            <h2 className="mb-3 text-lg font-medium text-primary-600">Mode</h2>
             <div className="flex">
               <button
                 onClick={toggleMode}
                 className="flex items-center gap-2 px-4 py-2 transition-all rounded-lg shadow-sm bg-primary-200 text-primary-700 hover:bg-primary-300"
-                title="Cambiar modo"
+                title="Change mode"
               >
                 {mode === "light" ? (
                   <>
@@ -89,7 +105,7 @@ export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
           {/* Esquemas de colores */}
           <div>
             <h2 className="mb-3 text-lg font-medium text-primary-600">
-              Esquema de colores
+              Color Schemes
             </h2>
             <div className="flex gap-6">
               <button
@@ -141,6 +157,51 @@ export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
                   </div>
                 </button>
               ))}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="mb-3 text-lg font-medium text-primary-600">
+              Services (API Keys)
+            </h2>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center bg-primary-50 rounded-lg shadow-sm border-2 border-transparent focus-within:border-primary-500 transition-all duration-200 hover:shadow-md">
+                <div className="p-3 flex items-center gap-2 bg-primary-100 rounded-l-lg min-w-32 text-primary-700 font-medium border-r border-primary-200">
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                  </svg>
+                  YouTube
+                </div>
+                <input
+                  type={showYouTubeKey ? "text" : "password"}
+                  value={youtubeInput}
+                  onChange={(e) => setYoutubeInput(e.target.value)}
+                  placeholder="Ingresa tu YouTube API Key"
+                  className="flex-1 p-3 bg-transparent focus:outline-none text-primary-700 placeholder-primary-400"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowYouTubeKey(!showYouTubeKey)}
+                  className="cursor-pointer p-4 flex justify-center bg-primary-200 rounded-l-md text-primary-600 font-semibold hover:bg-primary-300 transition-colors"
+                  aria-label={showYouTubeKey ? "Ocultar" : "Mostrar"}
+                >
+                  {showYouTubeKey ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+                <button
+                  onClick={handleSaveYoutube}
+                  className="cursor-pointer p-4 flex justify-center bg-primary-200 rounded-r-md text-primary-600 font-semibold hover:bg-primary-300 transition-colors"
+                >
+                  <Save className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>

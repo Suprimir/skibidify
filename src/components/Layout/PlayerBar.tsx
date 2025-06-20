@@ -6,7 +6,7 @@ import {
   Play,
   Volume2,
 } from "lucide-react";
-import { usePlayer } from "@Contexts/PlayerContext";
+import { usePlayer } from "@/contexts/player";
 
 export default function PlayerBar() {
   const {

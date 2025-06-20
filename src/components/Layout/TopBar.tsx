@@ -6,9 +6,17 @@ import { useState } from "react";
 export default function TopBar() {
   const [settingsMenuVisible, setSettingsMenuVisible] =
     useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleSettingsMenu = () => {
     setSettingsMenuVisible(true);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
   };
 
   const navigate = useNavigate();
@@ -26,6 +34,7 @@ export default function TopBar() {
         <div className="flex items-center w-full max-w-2xl px-5 py-1 mx-4 transition-all duration-200 border rounded-full shadow-sm bg-primary-200/80 backdrop-blur-sm border-primary-200/50 hover:shadow-md">
           <form
             autoComplete="off"
+            onSubmit={handleSubmit}
             className="flex items-center w-full max-w-2xl"
           >
             <label
@@ -36,6 +45,8 @@ export default function TopBar() {
             </label>
             <input
               id="searchBarInput"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1 py-2 pr-4 ml-4 text-lg font-medium bg-transparent border-r text-primary-800 placeholder-primary-400 focus:outline-none border-primary-400/50"
               placeholder="Search songs..."
               type="text"

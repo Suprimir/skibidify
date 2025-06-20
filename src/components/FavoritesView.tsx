@@ -1,9 +1,9 @@
-import { Library, Play, Shuffle } from "lucide-react";
+import { Heart, Play, Shuffle } from "lucide-react";
 import SongCard from "./SongCard";
 import { useSongs } from "@/contexts/song";
 import { usePlayer } from "@/contexts/player";
 
-export default function LibraryView() {
+export default function FavoritesView() {
   const { songs } = useSongs();
   const { setQueue, setShuffleQueue } = usePlayer();
 
@@ -11,14 +11,14 @@ export default function LibraryView() {
     <div>
       <div className="flex items-center w-full border shadow-lg bg-primary-100 rounded-2xl border-primary-200/50 backdrop-blur-sm">
         <div className="flex items-center justify-center w-24 h-24 m-6 transition-all border shadow-md sm:w-36 sm:h-36 rounded-3xl bg-primary-300/70 hover:bg-primary-300/50 border-primary-200/50 backdrop-blur-sm">
-          <Library className="w-16 h-16 transition-all text-primary-600 sm:w-24 sm:h-24 drop-shadow-sm" />
+          <Heart className="w-16 h-16 transition-all text-primary-600 sm:w-24 sm:h-24 drop-shadow-sm" />
         </div>
         <div>
           <h1 className="mx-4 text-4xl sm:text-6xl font-bold text-primary-800 drop-shadow-md">
-            Library
+            Favorites
           </h1>
           <p className="mx-4 text-lg font-semibold transition text-primary-600 sm:text-2xl drop-shadow-sm">
-            {songs.length} songs
+            {songs.filter((song) => song.favorite === true).length} songs
           </p>
         </div>
       </div>
@@ -39,11 +39,13 @@ export default function LibraryView() {
       </div>
 
       <div className="pb-8">
-        {songs.map((song) => (
-          <div key={song.id} className="pb-2">
-            <SongCard song={song} context="library" />
-          </div>
-        ))}
+        {songs
+          .filter((song) => song.favorite === true)
+          .map((song) => (
+            <div key={song.id} className="pb-2">
+              <SongCard song={song} context="favorites" />
+            </div>
+          ))}
       </div>
     </div>
   );

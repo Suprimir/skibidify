@@ -1,13 +1,14 @@
-import { useSongs } from "@Contexts/SongContext";
-import { FoldHorizontal, Library, Music } from "lucide-react";
+import { useSongs } from "@/contexts/song";
+import { FoldHorizontal, Heart, Library, Music, Star } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DropdownSidebar from "./Sidebar/DropdownSidebar";
 import ContextMenuPlaylist from "../ContextMenuPlaylist";
-import { type Playlist } from "@Types/Song";
+import { type Playlist } from "@/types/Song";
 
 const defaultPlaylist: Playlist = {
   id: "",
+  image: "",
   name: "",
   songs: [""],
 };
@@ -96,8 +97,29 @@ export default function Sidebar() {
             )}
           </button>
         </div>
+        <div onContextMenu={(e) => e.preventDefault()} className="mb-4">
+          <button
+            onClick={() => navigate("/favorites")}
+            className="flex items-center w-full gap-4 p-4 transition-all duration-200 border shadow-sm rounded-xl bg-gradient-to-r from-primary-100 to-primary-100 hover:from-primary-200 hover:to-primary-200 group hover:shadow-md border-primary-200/50 hover:border-primary-300"
+          >
+            <div className="flex-shrink-0 transition-colors duration-200 rounded-lg">
+              <Heart className="w-6 h-6 text-primary-600 group-hover:text-primary-700" />
+            </div>
+            {!isCollapsed && (
+              <p className="font-semibold truncate text-primary-700 group-hover:text-primary-800 drop-shadow-sm">
+                Favorites Songs
+              </p>
+            )}
+          </button>
+        </div>
+        <div className="flex items-center justify-center gap-2 text-primary-600 font-semibold my-4 border-b border-primary-600">
+          <Star className="w-4 h-4 fill-primary-600" />
+          <h1>Playlists</h1>
+          <Star className="w-4 h-4 fill-primary-600" />
+        </div>
         {playlists.map((playlist) => (
           <div
+            key={playlist.id}
             onContextMenu={(e) => {
               setSelectedPlaylist(playlist);
               handleContextMenu(e);
@@ -108,9 +130,14 @@ export default function Sidebar() {
               onClick={() => navigate(`/playlist?id=${playlist.id}`)}
               className="flex items-center w-full gap-4 p-4 transition-all duration-200 border shadow-sm rounded-xl bg-gradient-to-r from-primary-100 to-primary-100 hover:from-primary-200 hover:to-primary-200 group hover:shadow-md border-primary-200/50 hover:border-primary-300"
             >
-              <div className="flex-shrink-0 transition-colors duration-200 rounded-lg">
-                <Music className="w-6 h-6 text-primary-600 group-hover:text-primary-700" />
-              </div>
+              {!playlist.image ? (
+                <Music className="w-6 h-6 transition-all text-primary-600 drop-shadow-sm" />
+              ) : (
+                <img
+                  src={playlist.image}
+                  className="w-6 h-6 object-cover transition-all rounded-md drop-shadow-sm"
+                ></img>
+              )}
               {!isCollapsed && (
                 <p className="font-semibold truncate text-primary-700 group-hover:text-primary-800 drop-shadow-sm">
                   {playlist.name}

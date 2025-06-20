@@ -1,14 +1,22 @@
-import type { Song } from "@Types/Song";
+import type { Song } from "@/types/Song";
 import { useState } from "react";
 import { Play } from "lucide-react";
-import { usePlayer } from "@Contexts/PlayerContext";
+import { usePlayer } from "@/contexts/player";
 import CustomContextMenu from "./ContextMenuSong";
+
+export type SongCardContext = "library" | "playlist" | "favorites";
 
 interface SongCardProps {
   song: Song;
+  context?: SongCardContext;
+  playlistId?: string;
 }
 
-export default function SongCard({ song }: SongCardProps) {
+export default function SongCard({
+  song,
+  context = "library",
+  playlistId,
+}: SongCardProps) {
   const { handlePlay } = usePlayer();
 
   const [contextMenu, setContextMenu] = useState({
@@ -62,6 +70,8 @@ export default function SongCard({ song }: SongCardProps) {
         visible={contextMenu.visible}
         onClose={() => setContextMenu({ ...contextMenu, visible: false })}
         song={song}
+        context={context}
+        playlistId={playlistId}
       />
     </>
   );

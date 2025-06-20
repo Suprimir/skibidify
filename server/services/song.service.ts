@@ -4,6 +4,7 @@ import fs from "fs";
 import ffmpegPath from "ffmpeg-static";
 import { YouTubeSearchItem } from "../../types/YoutubeSearch";
 import { Song } from "../../types/Song";
+import { getAllPlaylists, savePlaylists } from "./playlist.service";
 
 const documentsDir = path.join(process.cwd(), "public", "songs");
 const songsJsonPath = path.join(documentsDir, "songs.json");
@@ -45,12 +46,30 @@ export const addSong = (
     thumbnailUrl: youtubeItem.snippet.thumbnails?.default?.url,
     filePath: relativePath,
     addedAt: new Date().toISOString(),
+    favorite: false,
   };
 
   songs.push(newSong);
   saveSongs(songs);
 
   return { success: true, message: "Song added" };
+};
+
+export const markAsFavoriteJSON = (songId: string) => {
+  ensureSongsDirExists();
+
+  const songs = getAllSongs();
+  const song = songs.find((s) => s.id === songId);
+
+  if (!song) return { success: false, message: "Song not found" };
+
+  song.favorite = !song.favorite;
+
+  saveSongs(songs);
+  return {
+    success: true,
+    message: `Song ${song.favorite ? "marked" : "unmarked"} as favorite`,
+  };
 };
 
 export const deleteSongById = (
@@ -70,7 +89,16 @@ export const deleteSongById = (
   }
 
   songs = songs.filter((s) => s.id !== songId);
+
+  let playlists = getAllPlaylists();
+
+  playlists = playlists.map((playlist) => ({
+    ...playlist,
+    songs: playlist.songs.filter((song) => song !== songId),
+  }));
+
   saveSongs(songs);
+  savePlaylists(playlists);
 
   return { success: true, message: "Song deleted" };
 };
@@ -85,14 +113,24 @@ export const downloadSongToDisk = async (
     `${youtubeItem.snippet.title}.mp3`
   );
 
-  await ytdlp(url, {
-    format: "bestaudio",
-    extractAudio: true,
-    audioFormat: "mp3",
-    audioQuality: 0,
-    output: outputPath,
-    ffmpegLocation: ffmpegPath ?? undefined,
-  });
+  try {
+    await ytdlp(url, {
+      format: "bestaudio",
+      extractAudio: true,
+      audioFormat: "mp3",
+      audioQuality: 0,
+      output: outputPath,
+      ffmpegLocation: ffmpegPath ?? undefined,
+    });
 
-  return outputPath;
+    return outputPath;
+  } catch (error) {
+    console.error("ytdlp failed:", error);
+
+    throw new Error(
+      `Failed to download video: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
+  }
 };
