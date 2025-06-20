@@ -1,11 +1,17 @@
-import type { Playlist, Song } from "@/types/Song";
+import type { Playlist, Song } from "src/types/Song";
 import { useEffect, useState } from "react";
 import { SongContext } from "./songContext";
 
 export const SongProvider = ({ children }: { children: React.ReactNode }) => {
+  /*
+        States
+  */
   const [songs, setSongs] = useState<Song[]>([]);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
+  /*
+        Funciones
+  */
   const refreshSongs = async () => {
     const res = await fetch("/api/songs");
     const data = await res.json();
@@ -132,27 +138,26 @@ export const SongProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  /*
+        Effect para inicializar las canciones y playlists
+  */
   useEffect(() => {
     refreshSongs();
     refreshPlaylists();
   }, []);
 
-  return (
-    <SongContext.Provider
-      value={{
-        songs,
-        playlists,
-        refreshSongs,
-        deleteSong,
-        addPlaylist,
-        deletePlaylist,
-        addSongToPlaylist,
-        updatePlaylist,
-        markAsFavorite,
-        removeSongFromPlaylist,
-      }}
-    >
-      {children}
-    </SongContext.Provider>
-  );
+  const value = {
+    songs,
+    playlists,
+    refreshSongs,
+    deleteSong,
+    addPlaylist,
+    deletePlaylist,
+    addSongToPlaylist,
+    updatePlaylist,
+    markAsFavorite,
+    removeSongFromPlaylist,
+  };
+
+  return <SongContext.Provider value={value}>{children}</SongContext.Provider>;
 };

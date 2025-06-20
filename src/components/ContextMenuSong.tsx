@@ -1,7 +1,6 @@
 // ContextMenuSong.tsx
 import { useSongs } from "@/contexts/song";
-import type { Song } from "@/types/Song";
-import type { SongCardContext } from "./SongCard";
+import type { Song, SongCardContext } from "@/types/Song";
 import { ChevronRight, Heart, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 

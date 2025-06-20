@@ -1,10 +1,8 @@
-import type { Song } from "@/types/Song";
+import type { Song, SongCardContext } from "@/types/Song";
 import { useState } from "react";
 import { Play } from "lucide-react";
 import { usePlayer } from "@/contexts/player";
 import CustomContextMenu from "./ContextMenuSong";
-
-export type SongCardContext = "library" | "playlist" | "favorites";
 
 interface SongCardProps {
   song: Song;

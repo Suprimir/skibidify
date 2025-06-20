@@ -1,8 +1,5 @@
+import type { Theme, ThemeAccent } from "@/types/Theme";
 import { createContext } from "react";
-
-type ThemeMode = "light" | "dark";
-type ThemeAccent = "pink" | "green" | "default";
-type Theme = `${ThemeMode}-${ThemeAccent}`;
 
 export interface ThemeContextType {
   theme: Theme;

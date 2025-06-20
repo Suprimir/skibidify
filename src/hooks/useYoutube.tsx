@@ -9,8 +9,6 @@ export const useYoutube = () => {
       throw new Error("YouTube API key not found");
     }
 
-    console.log("API Youtube Ejecutada");
-
     const endpoint = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(
       searchTerm
     )}&videoCategoryId=10&maxResults=10&order=relevance&key=${apiKey}`;
@@ -30,7 +28,6 @@ export const useYoutube = () => {
 
   return {
     searchSongs,
-    hasYouTubeKey: hasApiKey("YouTube"),
     isConfigured: hasApiKey("YouTube"),
   };
 };

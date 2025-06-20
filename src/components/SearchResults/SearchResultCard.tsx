@@ -43,7 +43,7 @@ export default function SearchResultCard({
     }
 
     return "idle";
-  }, [downloadingId, downloadingQueue, videoId]);
+  }, [downloadingId, downloadingQueue, videoId, songs]);
 
   const handleDownload = async () => {
     if (downloadState !== "idle" || !videoId) return;

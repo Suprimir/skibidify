@@ -1,14 +1,14 @@
 import { createPortal } from "react-dom";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Moon, Save, Sun, X, Eye, EyeOff } from "lucide-react";
 import { useTheme } from "@/contexts/theme";
 import { useApiKeys } from "src/hooks/useApiKeys";
+import type { ThemeAccent } from "@/types/Theme";
 
 interface SettingsMenuProps {
   visible: boolean;
   onClose: () => void;
 }
-type ThemeAccent = "pink" | "green" | "default";
 
 export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
   const [mounted, setMounted] = useState(false);
@@ -29,6 +29,12 @@ export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
     default: ["bg-slate-50", "bg-slate-200", "bg-slate-500", "bg-slate-800"],
   };
 
+  const loadApiKeys = useCallback(async () => {
+    const youtubeKey = await getApiKey("YouTube");
+
+    if (youtubeKey) setYoutubeInput(youtubeKey);
+  }, [getApiKey]);
+
   useEffect(() => {
     if (visible) {
       loadApiKeys();
@@ -38,19 +44,13 @@ export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
       const timeout = setTimeout(() => setMounted(false), 300);
       return () => clearTimeout(timeout);
     }
-  }, [visible]);
+  }, [visible, loadApiKeys]);
 
   useEffect(() => {
     if (mounted) {
       requestAnimationFrame(() => setShowing(true));
     }
   }, [mounted]);
-
-  const loadApiKeys = async () => {
-    const youtubeKey = await getApiKey("YouTube");
-
-    if (youtubeKey) setYoutubeInput(youtubeKey);
-  };
 
   const handleSaveYoutube = async () => {
     if (youtubeInput.trim()) {

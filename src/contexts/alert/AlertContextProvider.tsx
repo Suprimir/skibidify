@@ -1,25 +1,22 @@
 import { createPortal } from "react-dom";
 import { AlertContext } from "./alertContext";
-import { CheckCircle, Info, X, XCircle } from "lucide-react";
+import { CheckCircle, X, XCircle } from "lucide-react";
 import { useState, type ReactNode } from "react";
-
-type AlertType = "success" | "error";
-
-interface Alert {
-  id: string;
-  type: AlertType;
-  title: string;
-  message?: string;
-  duration?: number;
-}
+import type { Alert, AlertType } from "@/types/Alert";
 
 const randomUUID = () => {
   return crypto.randomUUID();
 };
 
 export const AlertProvider = ({ children }: { children: ReactNode }) => {
+  /*
+        States
+  */
   const [alerts, setAlerts] = useState<Alert[]>([]);
 
+  /*
+        Funciónes
+  */
   const showAlert = (
     type: AlertType,
     title: string,
@@ -47,34 +44,6 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
     setAlerts((prev) => prev.filter((alert) => alert.id !== id));
   };
 
-  const getAlertIcon = (type: Alert["type"]) => {
-    const iconProps = { className: "w-5 h-5 flex-shrink-0" };
-
-    switch (type) {
-      case "success":
-        return (
-          <CheckCircle
-            {...iconProps}
-            className={`${iconProps.className} text-primary-600`}
-          />
-        );
-      case "error":
-        return (
-          <XCircle
-            {...iconProps}
-            className={`${iconProps.className} text-primary-600`}
-          />
-        );
-      default:
-        return (
-          <Info
-            {...iconProps}
-            className={`${iconProps.className} text-primary-600`}
-          />
-        );
-    }
-  };
-
   const AlertContainer = () => {
     if (alerts.length === 0) return null;
 
@@ -86,7 +55,11 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
             className="border-l-4 p-4 rounded-lg shadow-lg backdrop-blur-sm bg-primary-50 border-primary-200 text-primary-600 animate-in slide-in-from-right duration-300"
           >
             <div className="flex items-start gap-3">
-              {getAlertIcon(alert.type)}
+              {alert.type === "success" ? (
+                <CheckCircle className="w-5 h-5 flex-shrink-0 text-primary-600" />
+              ) : (
+                <XCircle className="w-5 h-5 flex-shrink-0 text-primary-600" />
+              )}
 
               <div className="flex-1 min-w-0">
                 <h4 className="font-semibold text-sm">{alert.title}</h4>

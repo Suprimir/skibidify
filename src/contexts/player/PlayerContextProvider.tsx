@@ -1,4 +1,4 @@
-import type { Song } from "@/types/Song";
+import type { Song } from "src/types/Song";
 import {
   useCallback,
   useEffect,
@@ -9,6 +9,9 @@ import {
 import { PlayerContext, type PlayerContextType } from "./playerContext";
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
+  /*
+      States
+  */
   const [songQueue, setSongQueue] = useState<Song[] | null>(() => {
     const storedQueue = localStorage.getItem("playerSongQueue");
     return storedQueue ? (JSON.parse(storedQueue) as Song[]) : null;
@@ -35,32 +38,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(new Audio());
   const isInitialLoad = useRef(true);
 
-  // Función para limpiar el localStorage del player
-  const clearPlayerStorage = useCallback(() => {
-    localStorage.removeItem("playerSongQueue");
-    localStorage.removeItem("playerSongPlaying");
-    localStorage.removeItem("playerCurrentTime");
-  }, []);
-
-  // Función para limpiar completamente el queue
-  const clearQueue = useCallback(() => {
-    const audio = audioRef.current;
-
-    audio.pause();
-    audio.removeAttribute("src");
-    audio.load();
-
-    setSongQueue(null);
-    setSongPlaying(null);
-    setCurrentTime(0);
-    setDuration(0);
-    setPaused(true);
-
-    clearPlayerStorage();
-  }, [clearPlayerStorage]);
-
   /* 
-    Sincronizacion de las variables con localStorage
+      Sincronizacion de las variables con localStorage
   */
   useEffect(() => {
     if (songQueue && songQueue.length > 0) {
@@ -80,30 +59,40 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     localStorage.setItem("playerVolume", volume.toString());
-  }, [volume]);
-
-  useEffect(() => {
-    localStorage.setItem("playerCurrentTime", currentTime.toString());
-  }, [currentTime]);
-
-  useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
     }
   }, [volume]);
 
   useEffect(() => {
-    if (isInitialLoad.current && audioRef.current && songPlaying) {
-      audioRef.current.src = songPlaying.filePath;
-      audioRef.current.currentTime = currentTime;
-      audioRef.current.pause();
-      isInitialLoad.current = false;
-    }
-  }, [songPlaying, currentTime]);
+    localStorage.setItem("playerCurrentTime", currentTime.toString());
+  }, [currentTime]);
 
   /*
-    Funciones para manejar el player
+      Funciónes
   */
+  const clearPlayerStorage = useCallback(() => {
+    localStorage.removeItem("playerSongQueue");
+    localStorage.removeItem("playerSongPlaying");
+    localStorage.removeItem("playerCurrentTime");
+  }, []);
+
+  const clearQueue = useCallback(() => {
+    const audio = audioRef.current;
+
+    audio.pause();
+    audio.removeAttribute("src");
+    audio.load();
+
+    setSongQueue(null);
+    setSongPlaying(null);
+    setCurrentTime(0);
+    setDuration(0);
+    setPaused(true);
+
+    clearPlayerStorage();
+  }, [clearPlayerStorage]);
+
   const handlePlay = useCallback((song: Song) => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -162,35 +151,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       }
     }
   }, [songQueue, songPlaying, handlePlay]);
-
-  // Event Listeners
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const handleEnded = () => {
-      playNext();
-    };
-
-    const handleTimeUpdate = () => {
-      const newCurrentTime = audio.currentTime;
-      setCurrentTime(newCurrentTime);
-    };
-
-    const handleMetadata = () => {
-      setDuration(audio.duration);
-    };
-
-    audio.addEventListener("ended", handleEnded);
-    audio.addEventListener("timeupdate", handleTimeUpdate);
-    audio.addEventListener("loadedmetadata", handleMetadata);
-
-    return () => {
-      audio.removeEventListener("ended", handleEnded);
-      audio.removeEventListener("timeupdate", handleTimeUpdate);
-      audio.removeEventListener("loadedmetadata", handleMetadata);
-    };
-  }, [playNext, songPlaying]);
 
   const setVolume = (value: number) => {
     setVolumeState(value);
@@ -252,6 +212,46 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       setCurrentTime(time);
     }
   };
+
+  /*
+      Effects para el manejo del player
+  */
+  useEffect(() => {
+    if (isInitialLoad.current && audioRef.current && songPlaying) {
+      audioRef.current.src = songPlaying.filePath;
+      audioRef.current.currentTime = currentTime;
+      audioRef.current.pause();
+      isInitialLoad.current = false;
+    }
+  }, [songPlaying, currentTime]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleEnded = () => {
+      playNext();
+    };
+
+    const handleTimeUpdate = () => {
+      const newCurrentTime = audio.currentTime;
+      setCurrentTime(newCurrentTime);
+    };
+
+    const handleMetadata = () => {
+      setDuration(audio.duration);
+    };
+
+    audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("loadedmetadata", handleMetadata);
+
+    return () => {
+      audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("loadedmetadata", handleMetadata);
+    };
+  }, [playNext, songPlaying]);
 
   const value: PlayerContextType = {
     handlePlay,

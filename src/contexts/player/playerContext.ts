@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import type { Song } from "@/types/Song";
+import type { Song } from "src/types/Song";
 
 export interface PlayerContextType {
   handlePlay: (song: Song) => void;

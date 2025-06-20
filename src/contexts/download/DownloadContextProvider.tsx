@@ -3,10 +3,16 @@ import { useAlert } from "@/contexts/alert";
 import { useSongs } from "@/contexts/song";
 import { Clock, Download, LoaderCircle, Music, X } from "lucide-react";
 import { DownloadContext } from "./downloadContext";
-import type { YouTubeSearchItem } from "@/types/YoutubeSearch";
+import type { YouTubeSearchItem } from "src/types/YoutubeSearch";
 
 export const DownloadProvider = ({ children }: { children: ReactNode }) => {
-  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  /*
+      States
+  */
+  const [downloadingId, setDownloadingId] = useState<string | null>(() => {
+    return localStorage.getItem("currentDownloadingId");
+  });
+
   const [downloadingQueue, setDownloadingQueue] = useState<YouTubeSearchItem[]>(
     () => {
       const storedDownloadQueue = localStorage.getItem("downloadQueue");
@@ -15,10 +21,26 @@ export const DownloadProvider = ({ children }: { children: ReactNode }) => {
         : [];
     }
   );
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+
+  /*
+      Hooks
+  */
   const { showAlert } = useAlert();
   const { songs, refreshSongs } = useSongs();
+
+  /* 
+      Sincronizacion de las variables con localStorage
+  */
+  useEffect(() => {
+    if (downloadingId) {
+      localStorage.setItem("currentDownloadingId", downloadingId);
+    } else {
+      localStorage.removeItem("currentDownloadingId");
+    }
+  }, [downloadingId]);
 
   useEffect(() => {
     if (downloadingQueue && downloadingQueue.length > 0) {
@@ -29,6 +51,37 @@ export const DownloadProvider = ({ children }: { children: ReactNode }) => {
   }, [downloadingQueue]);
 
   const isDownloading = downloadingId !== null || downloadingQueue.length > 0;
+
+  /*
+      Funciónes
+  */
+  const addToDownloadQueue = (youtubeItem: YouTubeSearchItem) => {
+    const videoId = youtubeItem.id.videoId;
+
+    if (!videoId) return;
+
+    if (songs.find((song) => song.id === videoId)) return;
+
+    setDownloadingQueue((prev) => {
+      const exists = prev.some(
+        (item) => item.id.videoId === youtubeItem.id.videoId
+      );
+      if (exists) {
+        return prev;
+      }
+      return [...prev, youtubeItem];
+    });
+  };
+
+  const removeFromQueue = (videoId?: string) => {
+    if (!videoId) return;
+
+    if (downloadingId === videoId) return;
+
+    setDownloadingQueue((prev) =>
+      prev.filter((item) => item.id.videoId !== videoId)
+    );
+  };
 
   const downloadSong = useCallback(
     async (youtubeItem: YouTubeSearchItem) => {
@@ -66,6 +119,47 @@ export const DownloadProvider = ({ children }: { children: ReactNode }) => {
     [refreshSongs, showAlert]
   );
 
+  /*  
+      Effects para el manejo de descargas
+  */
+
+  // Effect para la recuperacion de descargas tras un refresh
+  useEffect(() => {
+    const handlePageLoad = async () => {
+      // Si hay downloadingId en localStorage y downloadingQueue
+      if (downloadingId && downloadingQueue.length > 0) {
+        // Recupera la cancion que se esta descargando
+        const currentSong = downloadingQueue.find(
+          (song) => song.id.videoId === downloadingId
+        );
+
+        // Si existe
+        if (currentSong) {
+          // Verifica en las canciones si se encuentra ya descargada
+          const isAlreadyDownloaded = songs.some(
+            (song) => song.id === downloadingId
+          );
+
+          if (isAlreadyDownloaded) {
+            // Si ya se descargo quitar el id de la downloadingQueue
+            setDownloadingQueue((prev) =>
+              prev.filter((song) => song.id.videoId !== downloadingId)
+            );
+            setDownloadingId(null);
+            showAlert(
+              "success",
+              "Download completed",
+              "Song was downloaded successfully"
+            );
+          }
+        }
+      }
+    };
+
+    handlePageLoad();
+  }, [downloadingId, downloadingQueue, songs, showAlert]);
+
+  // Effect para procesar las descargas de downloadingQueue
   useEffect(() => {
     if (downloadingQueue.length === 0 || isProcessing) return;
 
@@ -73,57 +167,26 @@ export const DownloadProvider = ({ children }: { children: ReactNode }) => {
       setIsProcessing(true);
 
       const currentSong = downloadingQueue[0];
-      await downloadSong(currentSong);
-      setDownloadingQueue((prev) =>
-        prev.filter((song) => song.id !== currentSong.id)
-      );
+
+      // Si ya hay una descarga en progreso, no iniciar otra
+      if (downloadingId && downloadingId !== currentSong.id.videoId) {
+        setIsProcessing(false);
+        return;
+      }
+
+      // Si no hay descarga en progreso iniciar la descarga de la siguiente
+      if (!downloadingId) {
+        await downloadSong(currentSong);
+        setDownloadingQueue((prev) =>
+          prev.filter((song) => song.id.videoId !== currentSong.id.videoId)
+        );
+      }
 
       setIsProcessing(false);
     };
 
     processQueue();
-  }, [downloadingQueue, isProcessing, downloadSong]);
-
-  const addToDownloadQueue = (youtubeItem: YouTubeSearchItem) => {
-    const videoId = youtubeItem.id.videoId;
-
-    if (!videoId) {
-      showAlert("error", "Invalid video", "This video doesn't have a valid ID");
-      return;
-    }
-
-    if (songs.find((song) => song.id === videoId)) {
-      showAlert(
-        "error",
-        "Already downloaded",
-        "This song has already been downloaded"
-      );
-      return;
-    }
-
-    setDownloadingQueue((prev) => {
-      const exists = prev.some(
-        (item) => item.id.videoId === youtubeItem.id.videoId
-      );
-      if (exists) {
-        showAlert(
-          "error",
-          "Already in queue",
-          "This song is already in the download queue"
-        );
-        return prev;
-      }
-      return [...prev, youtubeItem];
-    });
-  };
-
-  const removeFromQueue = (videoId?: string) => {
-    if (!videoId) return;
-
-    setDownloadingQueue((prev) =>
-      prev.filter((item) => item.id.videoId !== videoId)
-    );
-  };
+  }, [downloadingQueue, isProcessing, downloadSong, downloadingId]);
 
   const value = {
     downloadingId,
@@ -247,6 +310,11 @@ export const DownloadProvider = ({ children }: { children: ReactNode }) => {
           <div className="bg-primary-500 text-white p-4 rounded-full shadow-lg flex items-center gap-3 cursor-pointer hover:bg-primary-600 transition-all hover:scale-105">
             <div className="relative">
               <Download className="w-6 h-6" />
+              {downloadingQueue.length > 0 && (
+                <div className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+                  {downloadingQueue.length}
+                </div>
+              )}
             </div>
           </div>
         </div>

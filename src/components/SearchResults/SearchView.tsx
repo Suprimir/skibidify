@@ -1,8 +1,6 @@
-// MAIN COMPONENT
-
 import type { YouTubeSearchResponse } from "@/types/YoutubeSearch";
 import { Download } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import SearchBar from "src/components/SearchResults/SearchBar";
 import SearchResultCard from "src/components/SearchResults/SearchResultCard";
@@ -14,22 +12,26 @@ export default function SearchView() {
   const [selectedProvider, setSelectedProvider] = useState<
     "YouTube" | "Bandcamp"
   >("YouTube");
-  const { searchSongs, hasYouTubeKey } = useYoutube();
+  const { searchSongs, isConfigured } = useYoutube();
   const [searchParams, setSearchParams] = useSearchParams();
   const searchTerm = searchParams.get("q");
+
+  const handleSearch = useCallback(
+    async (searchTerm: string) => {
+      const youtubeSearchResponse: YouTubeSearchResponse | null =
+        await searchSongs(searchTerm);
+
+      if (youtubeSearchResponse)
+        setYoutubeSearchResponse(youtubeSearchResponse);
+    },
+    [searchSongs]
+  );
 
   useEffect(() => {
     if (!searchTerm) return;
 
     handleSearch(searchTerm);
-  }, [hasYouTubeKey, searchTerm]);
-
-  const handleSearch = async (searchTerm: string) => {
-    const youtubeSearchResponse: YouTubeSearchResponse | null =
-      await searchSongs(searchTerm);
-
-    if (youtubeSearchResponse) setYoutubeSearchResponse(youtubeSearchResponse);
-  };
+  }, [isConfigured, searchTerm, handleSearch]);
 
   return (
     <div className="space-y-2 pb-8">

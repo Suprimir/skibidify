@@ -1,3 +1,4 @@
+import type { AlertType } from "@/types/Alert";
 import { createContext } from "react";
 
 export interface AlertContextType {
@@ -8,7 +9,5 @@ export interface AlertContextType {
     duration?: number
   ) => void;
 }
-
-type AlertType = "success" | "error";
 
 export const AlertContext = createContext<AlertContextType | null>(null);

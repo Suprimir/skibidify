@@ -15,3 +15,5 @@ export interface Playlist {
   name: string;
   songs: string[];
 }
+
+export type SongCardContext = "library" | "playlist" | "favorites";

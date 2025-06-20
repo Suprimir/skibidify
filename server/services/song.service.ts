@@ -2,13 +2,23 @@ import ytdlp from "yt-dlp-exec";
 import path from "path";
 import fs from "fs";
 import ffmpegPath from "ffmpeg-static";
-import { YouTubeSearchItem } from "../../types/YoutubeSearch";
-import { Song } from "../../types/Song";
+import { YouTubeSearchItem } from "../../src/types/YoutubeSearch";
+import { Song } from "../../src/types/Song";
 import { getAllPlaylists, savePlaylists } from "./playlist.service";
 
 const documentsDir = path.join(process.cwd(), "public", "songs");
 const songsJsonPath = path.join(documentsDir, "songs.json");
 
+const sanitizeFilename = (filename: string): string => {
+  return filename
+    .replace(/[<>:"/\\|?*]/g, "")
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ")
+    .trim()
+    .substring(0, 200);
+};
 const ensureSongsDirExists = () => {
   if (!fs.existsSync(documentsDir)) {
     fs.mkdirSync(documentsDir, { recursive: true });
@@ -36,11 +46,13 @@ export const addSong = (
   const exists = songs.find((s) => s.id === youtubeItem.id.videoId);
   if (exists) return { success: false, message: "Song already exists" };
 
-  const relativePath = `/songs/${youtubeItem.snippet.title}.mp3`;
+  const relativePath = `/songs/${sanitizeFilename(
+    youtubeItem.snippet.title
+  )}.mp3`;
 
   const newSong: Song = {
     id: youtubeItem.id.videoId ?? "",
-    title: youtubeItem.snippet.title,
+    title: sanitizeFilename(youtubeItem.snippet.title),
     channelTitle: youtubeItem.snippet.channelTitle,
     description: youtubeItem.snippet.description,
     thumbnailUrl: youtubeItem.snippet.thumbnails?.default?.url,
@@ -110,7 +122,7 @@ export const downloadSongToDisk = async (
   const url = `https://www.youtube.com/watch?v=${youtubeItem.id.videoId}`;
   const outputPath = path.join(
     documentsDir,
-    `${youtubeItem.snippet.title}.mp3`
+    `${sanitizeFilename(youtubeItem.snippet.title)}.mp3`
   );
 
   try {

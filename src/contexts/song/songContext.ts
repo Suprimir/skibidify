@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import type { Playlist, Song } from "@/types/Song";
+import type { Playlist, Song } from "src/types/Song";
 
 export interface SongContextType {
   songs: Song[];

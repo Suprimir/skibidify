@@ -1,37 +1,6 @@
 import { useAlert } from "@/contexts/alert";
+import type { ApiKeysStore } from "@/types/ApiKeys";
 import { useState, useEffect } from "react";
-
-interface ApiKeyData {
-  key: string;
-  createdAt: string;
-  updatedAt?: string;
-  lastUsed?: string | null;
-}
-
-interface ApiKeysStore {
-  [serviceName: string]: ApiKeyData;
-}
-
-interface UseApiKeysReturn {
-  getApiKey: (serviceName: string) => string | null;
-  setApiKey: (serviceName: string, key: string) => void;
-  removeApiKey: (serviceName: string) => void;
-  hasApiKey: (serviceName: string) => boolean;
-  getServices: () => string[];
-  clearAllKeys: () => void;
-  apiKeys: string[];
-  isLoading: boolean;
-  error: string | null;
-}
-
-interface UseApiKeyReturn {
-  key: string | null;
-  setKey: (key: string) => void;
-  removeKey: () => void;
-  hasKey: boolean;
-  isLoading: boolean;
-  error: string | null;
-}
 
 const encryptKey = (key: string): string => {
   try {
@@ -51,49 +20,29 @@ const decryptKey = (encryptedKey: string): string => {
   }
 };
 
-const STORAGE_KEY = "apiKeys";
-
-export const useApiKeys = (): UseApiKeysReturn => {
+export const useApiKeys = () => {
   const [apiKeys, setApiKeys] = useState<ApiKeysStore>({});
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const { showAlert } = useAlert();
 
   useEffect(() => {
-    const loadApiKeys = (): void => {
+    const loadApiKeys = () => {
       try {
-        setIsLoading(true);
-        setError(null);
-
-        const stored = localStorage.getItem(STORAGE_KEY);
+        const stored = localStorage.getItem("apiKeys");
         if (stored) {
           const parsedKeys: ApiKeysStore = JSON.parse(stored);
           setApiKeys(parsedKeys);
         }
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Unknown error occurred";
         console.error("Error loading API keys:", error);
-        setError(`Failed to load API keys: ${errorMessage}`);
-      } finally {
-        setIsLoading(false);
       }
     };
 
     loadApiKeys();
   }, []);
 
-  const saveToStorage = (keys: ApiKeysStore): void => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(keys));
-      setApiKeys(keys);
-      setError(null);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error occurred";
-      console.error("Error saving API keys:", error);
-      setError(`Failed to save API keys: ${errorMessage}`);
-    }
+  const saveToStorage = (keys: ApiKeysStore) => {
+    localStorage.setItem("apiKeys", JSON.stringify(keys));
+    setApiKeys(keys);
   };
 
   const getApiKey = (serviceName: string): string | null => {
@@ -119,10 +68,7 @@ export const useApiKeys = (): UseApiKeysReturn => {
 
       return decryptKey(keyData.key);
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error occurred";
       console.error("Error getting API key:", error);
-      setError(`Failed to get API key: ${errorMessage}`);
       return null;
     }
   };
@@ -155,10 +101,7 @@ export const useApiKeys = (): UseApiKeysReturn => {
         `${serviceName} key saved succesfully.`
       );
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error occurred";
       console.error("Error setting API key:", error);
-      setError(`Failed to set API key: ${errorMessage}`);
     }
   };
 
@@ -172,10 +115,7 @@ export const useApiKeys = (): UseApiKeysReturn => {
       delete updatedKeys[serviceName];
       saveToStorage(updatedKeys);
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error occurred";
       console.error("Error removing API key:", error);
-      setError(`Failed to remove API key: ${errorMessage}`);
     }
   };
 
@@ -183,55 +123,11 @@ export const useApiKeys = (): UseApiKeysReturn => {
     return !!apiKeys[serviceName];
   };
 
-  const getServices = (): string[] => {
-    return Object.keys(apiKeys);
-  };
-
-  // Limpiar todas las keys
-  const clearAllKeys = (): void => {
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-      setApiKeys({});
-      setError(null);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error occurred";
-      console.error("Error clearing API keys:", error);
-      setError(`Failed to clear API keys: ${errorMessage}`);
-    }
-  };
-
   return {
     getApiKey,
     setApiKey,
     removeApiKey,
     hasApiKey,
-    getServices,
-    clearAllKeys,
     apiKeys: Object.keys(apiKeys),
-    isLoading,
-    error,
   };
 };
-
-export const useApiKey = (serviceName: string): UseApiKeyReturn => {
-  const { getApiKey, setApiKey, hasApiKey, removeApiKey, isLoading, error } =
-    useApiKeys();
-
-  if (!serviceName.trim()) {
-    throw new Error("Service name is required for useApiKey hook");
-  }
-
-  const key = hasApiKey(serviceName) ? getApiKey(serviceName) : null;
-
-  return {
-    key,
-    setKey: (key: string) => setApiKey(serviceName, key),
-    removeKey: () => removeApiKey(serviceName),
-    hasKey: hasApiKey(serviceName),
-    isLoading,
-    error,
-  };
-};
-
-export type CommonServices = "YouTube" | string;

@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs";
-import { Playlist } from "../../types/Song";
+import { Playlist } from "../../src/types/Song";
 import { randomUUID } from "crypto";
 
 const documentsDir = path.join(process.cwd(), "public", "songs");

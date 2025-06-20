@@ -1,4 +1,4 @@
-import type { YouTubeSearchItem } from "@/types/YoutubeSearch";
+import type { YouTubeSearchItem } from "src/types/YoutubeSearch";
 import { createContext } from "react";
 
 export interface DownloadContextType {
