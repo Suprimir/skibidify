@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./pages/Layout";
-import Home from "./pages/Home";
+import HomePage from "./pages/HomePage";
 import "./App.css";
 import DownloadPage from "./pages/DownloadPage";
 import LibraryPage from "./pages/LibraryPage";
@@ -14,7 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="home" replace />} />
-          <Route path="home" element={<Home />} />
+          <Route path="home" element={<HomePage />} />
           <Route path="download" element={<DownloadPage />} />
           <Route path="library" element={<LibraryPage />} />
           <Route path="playlist" element={<PlaylistPage />} />

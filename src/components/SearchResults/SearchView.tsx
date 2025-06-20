@@ -31,7 +31,7 @@ export default function SearchView() {
     if (!searchTerm) return;
 
     handleSearch(searchTerm);
-  }, [isConfigured, searchTerm, handleSearch]);
+  }, [isConfigured, searchTerm]);
 
   return (
     <div className="space-y-2 pb-8">

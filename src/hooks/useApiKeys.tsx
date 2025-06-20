@@ -1,6 +1,6 @@
 import { useAlert } from "@/contexts/alert";
 import type { ApiKeysStore } from "@/types/ApiKeys";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 const encryptKey = (key: string): string => {
   try {
@@ -45,33 +45,36 @@ export const useApiKeys = () => {
     setApiKeys(keys);
   };
 
-  const getApiKey = (serviceName: string): string | null => {
-    try {
-      if (!serviceName.trim()) {
-        throw new Error("Service name cannot be empty");
-      }
+  const getApiKey = useCallback(
+    (serviceName: string): string | null => {
+      try {
+        if (!serviceName.trim()) {
+          throw new Error("Service name cannot be empty");
+        }
 
-      const keyData = apiKeys[serviceName];
-      if (!keyData) {
-        console.warn(`API key for ${serviceName} not found`);
+        const keyData = apiKeys[serviceName];
+        if (!keyData) {
+          console.warn(`API key for ${serviceName} not found`);
+          return null;
+        }
+
+        const updatedKeys: ApiKeysStore = {
+          ...apiKeys,
+          [serviceName]: {
+            ...keyData,
+            lastUsed: new Date().toISOString(),
+          },
+        };
+        saveToStorage(updatedKeys);
+
+        return decryptKey(keyData.key);
+      } catch (error) {
+        console.error("Error getting API key:", error);
         return null;
       }
-
-      const updatedKeys: ApiKeysStore = {
-        ...apiKeys,
-        [serviceName]: {
-          ...keyData,
-          lastUsed: new Date().toISOString(),
-        },
-      };
-      saveToStorage(updatedKeys);
-
-      return decryptKey(keyData.key);
-    } catch (error) {
-      console.error("Error getting API key:", error);
-      return null;
-    }
-  };
+    },
+    [apiKeys]
+  );
 
   const setApiKey = (serviceName: string, key: string): void => {
     try {

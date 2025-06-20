@@ -33,7 +33,7 @@ export default function SettingsMenu({ visible, onClose }: SettingsMenuProps) {
     const youtubeKey = await getApiKey("YouTube");
 
     if (youtubeKey) setYoutubeInput(youtubeKey);
-  }, [getApiKey]);
+  }, []);
 
   useEffect(() => {
     if (visible) {
